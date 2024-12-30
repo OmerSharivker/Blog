@@ -1,0 +1,93 @@
+import React, { useState } from 'react';
+import { FaFacebook, FaGoogle } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
+const Register: React.FC = () => {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleRegister = () => {
+        // Handle the registration logic
+        console.log('Register:', { username, email, password });
+    };
+
+    return (
+        <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-grow p-4 flex justify-center items-center">
+                <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
+                    <div className="flex justify-center mb-4">
+                        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center mr-2">
+                            <FaFacebook className="mr-2" />
+                            Login with Facebook
+                        </button>
+                        <button className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center">
+                            <FaGoogle className="mr-2" />
+                            Login with Google
+                        </button>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                            Username
+                        </label>
+                        <input
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter your username"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                            Email
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter your email"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                            Password
+                        </label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter your password"
+                        />
+                    </div>
+                    <button
+                        onClick={handleRegister}
+                        className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                    >
+                        Register
+                    </button>
+                    <div className="mt-4 text-center">
+                        <p className="text-gray-700">
+                            Already have an account?{' '}
+                            <Link to="/login" className="text-blue-500 hover:underline">
+                                Login
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    );
+};
+
+export default Register;
