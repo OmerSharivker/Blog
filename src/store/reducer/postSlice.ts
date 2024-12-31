@@ -39,7 +39,7 @@ export const setLike = createAsyncThunk(
         try {
             const { data } = await api.put(`/posts/like/${postId}`, null, {
                 headers: {
-                    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzNkY2VhMGUyNTBhYWRiMTI3YTE2NyIsImlhdCI6MTczNTY1MzM5NiwiZXhwIjoxNzM1NjU2OTk2fQ.YlW0GJP8NmXKiDjQ-C_uanpDWKVKpFg79-iVadC9t7o"
+                    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzNkYjMxNTQ2ZWFkMTdhMzc0NjNjYiIsImlhdCI6MTczNTY1NTA5MiwiZXhwIjoxNzM1NjU4NjkyfQ.IzdI5wCf0LwuKKm9p1p9yuJCYqVKk9fZ6CtL6qwS9Yk"
                 }
             });
             return fulfillWithValue(data);
