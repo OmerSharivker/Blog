@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Post from '../components/Post';
+import { toast } from 'react-toastify';
+import { messageClear } from '../store/reducer/postSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { get_posts } from '../store/reducer/postSlice';
 import { AppDispatch, RootState } from '../store/store';
+
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -13,8 +15,14 @@ const Home: React.FC = () => {
         navigate('/create-post');
     };
 
-    
-
+    const dispatch = useDispatch<AppDispatch>();
+    const { successMessage } = useSelector((state: RootState) => state.posts);
+    useEffect(() => {
+        if (successMessage) {
+            toast.success(successMessage)
+            dispatch(messageClear()) 
+      }
+    },[successMessage])
 
 
  
