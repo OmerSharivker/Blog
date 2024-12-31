@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Post from '../components/Post';
+import { async } from '../../node_modules/sucrase/dist/transformers/CJSImportTransformer';
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Home: React.FC = () => {
     const handleCreatePost = () => {
         navigate('/create-post');
     };
+
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">

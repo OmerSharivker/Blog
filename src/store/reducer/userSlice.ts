@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+
+
 interface UserState {
     name: string;
     image: string;
