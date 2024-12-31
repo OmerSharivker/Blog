@@ -4,14 +4,14 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Post from '../components/Post';
 import { async } from '../../node_modules/sucrase/dist/transformers/CJSImportTransformer';
+import { useSelector } from 'react-redux';
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
-
     const handleCreatePost = () => {
         navigate('/create-post');
     };
-
+ 
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
