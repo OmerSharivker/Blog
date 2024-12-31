@@ -13,17 +13,9 @@ const Home: React.FC = () => {
         navigate('/create-post');
     };
 
-    const { posts } = useSelector((state: RootState) => state.posts);
-    const dispatch = useDispatch<AppDispatch>();
     
-    useEffect(()=>{
-        dispatch(get_posts())
-    },[])
 
 
-    useEffect(() => {
-        console.log('Posts:', posts);
-    }, [posts]);
 
  
 
