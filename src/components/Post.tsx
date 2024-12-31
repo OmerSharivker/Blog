@@ -1,8 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 // interface PostProps {}
 
 const Post: React.FC = () => {
+
     const posts = [
         {
             id: 1,
@@ -40,7 +42,7 @@ const Post: React.FC = () => {
                     </div>
                     <div className="p-4 flex justify-between items-center border-t">
                         <button className="text-blue-500">Like</button>
-                        <button className="text-blue-500">Comments</button>
+                        <Link to="/comments" className="text-blue-500">Comments</Link>
                     </div>
                 </div>
             ))}
