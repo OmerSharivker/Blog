@@ -1,10 +1,12 @@
 // filepath: /Users/omersharivker/dev/front_blog/src/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '../store/reducer/userSlice';
+import postSlice from './reducer/postSlice';
 
 const store = configureStore({
     reducer: {
         user: userReducer,
+        posts : postSlice
     },
 });
 

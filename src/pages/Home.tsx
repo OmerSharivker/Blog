@@ -3,14 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Post from '../components/Post';
-import { async } from '../../node_modules/sucrase/dist/transformers/CJSImportTransformer';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_posts } from '../store/reducer/postSlice';
+import { AppDispatch, RootState } from '../store/store';
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
     const handleCreatePost = () => {
         navigate('/create-post');
     };
+
+    const { posts } = useSelector((state: RootState) => state.posts);
+    const dispatch = useDispatch<AppDispatch>();
+    
+    useEffect(()=>{
+        dispatch(get_posts())
+    },[])
+
+
+    useEffect(() => {
+        console.log('Posts:', posts);
+    }, [posts]);
+
  
 
     return (
