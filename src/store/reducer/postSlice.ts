@@ -2,6 +2,20 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../api/api';
 
 
+// Define the Post type based on your API response structure
+interface Post {
+    id: number;
+    title: string;
+    content: string;
+}
+
+// Define the state type for the slice
+interface PostState {
+    posts: Post[]; 
+    errorMessage: string; 
+    successMessage: string; 
+}
+
 
 export const get_posts = createAsyncThunk(
     'posts/get_posts',
@@ -17,13 +31,12 @@ export const get_posts = createAsyncThunk(
 )
 
 export const postSlice = createSlice({
-    name: 'post',
+    name: 'posts',
     initialState: {
         posts: [],
-        post: {},
         errorMessage : '',
         successMessage: '',
-    },
+    } as PostState,
     reducers : {
         messageClear : (state) => {
             state.errorMessage = ""
@@ -34,7 +47,7 @@ export const postSlice = createSlice({
     extraReducers: (builder) => {
         builder
         .addCase(get_posts.fulfilled, (state, { payload }) => {
-            state.posts = payload.posts;
+            state.posts = payload.getPosts;
         })
 
     }
