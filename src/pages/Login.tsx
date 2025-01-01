@@ -1,22 +1,38 @@
 import React, { useState } from 'react';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
+import { login } from '../store/reducer/userSlice';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    const handleLogin = () => {
-        // Handle the login logic
-        console.log('Login:', { email, password });
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const handleLogin = async () => {
+        if (!email || !password) {
+            toast.error('Please fill in all fields');
+            return;
+        } else {
+            try {
+                await dispatch(login({ email, password })).unwrap();
+                toast.success('Login successful');
+                navigate('/api/posts');
+                
+            } catch (err : any) {
+                toast.error(err);
+            }
+        }
     };
 
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-grow p-4 flex justify-center items-center">
+            <main className="flex-grow p-4 flex justify-center items-center pb-20">
                 <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
                     <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
                     <div className="flex justify-center mb-4">
