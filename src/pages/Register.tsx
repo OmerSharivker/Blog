@@ -3,21 +3,44 @@ import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { toast } from 'react-toastify';
+import { register } from '../store/reducer/userSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
+import { useNavigate } from 'react-router-dom';
 
 const Register: React.FC = () => {
-    const [username, setUsername] = useState('');
+    const [userName, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const handleRegister = async () => {
 
-    const handleRegister = () => {
-        // Handle the registration logic
-        console.log('Register:', { username, email, password });
+        if (!email || !password || !userName) {
+            toast.error('Please fill in all fields');
+            return;
+        } else
+        if (password !== confirmPassword) {
+            toast.error('Passwords do not match');
+            return;
+        } else {
+            try {
+                await dispatch(register({ email, password, userName })).unwrap();
+                toast.success('Registration successful');
+                navigate('/login');
+                
+            } catch (err : any) {
+                toast.error(err);
+            }
+        }
     };
 
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-grow p-4 flex justify-center items-center">
+            <main className="flex-grow p-4 flex justify-center items-center pb-20">
                 <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
                     <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
                     <div className="flex justify-center mb-4">
@@ -37,8 +60,8 @@ const Register: React.FC = () => {
                         <input
                             id="username"
                             type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter your username"
                         />
@@ -67,6 +90,19 @@ const Register: React.FC = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter your password"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
+                           Confirm Password
+                        </label>
+                        <input
+                            id="confirmPassword"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Confirm password"
                         />
                     </div>
                     <button
