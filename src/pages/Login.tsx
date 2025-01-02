@@ -21,7 +21,7 @@ const Login: React.FC = () => {
             try {
                 await dispatch(login({ email, password })).unwrap();
                 toast.success('Login successful');
-                navigate('/api/posts');
+                navigate('/');
                 
             } catch (err : any) {
                 toast.error(err);
