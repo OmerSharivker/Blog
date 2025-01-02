@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 
+//const navigate = useNavigate();
+
 const getAccessToken = async (): Promise<string | null> => {
     const tokenExpiry = localStorage.getItem('accessTokenExpiry');
     const currentTime = Date.now();
@@ -14,6 +16,10 @@ const getAccessToken = async (): Promise<string | null> => {
     } else {
         // Token is still valid
         const accessToken = localStorage.getItem('accessToken');
+        if(!accessToken) {
+            await logout(useNavigate());
+            return null;
+        }
         return accessToken;
     }
 };
@@ -21,11 +27,11 @@ const getAccessToken = async (): Promise<string | null> => {
 // Function to refresh access token if expired
 const refreshAccessToken = async (): Promise<string | null> => {
     const refreshTokenExpiry = localStorage.getItem('refreshTokenExpiry');
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = localStorage.getItem('refreshTokens');
     
     if (refreshTokenExpiry && Date.now() >= parseInt(refreshTokenExpiry, 10)) {
         // log out user if refresh token is expired
-        await logout();
+        await logout(useNavigate());
         return null;
     }
 
@@ -38,25 +44,26 @@ const refreshAccessToken = async (): Promise<string | null> => {
         return response.data.token;
     } catch (error) {
         //logout user
-        await logout();
+        await logout(useNavigate());
         throw error;
     }
 };
 
-const logout = async (): Promise<void> => {
+const logout = async (navigate: ReturnType<typeof useNavigate>): Promise<void> => {
+    const refreshToken = localStorage.getItem('refreshTokens');
+    console.log(refreshToken);
     localStorage.removeItem('accessToken');
-    // localStorage.removeItem('refreshToken');
     localStorage.removeItem('accessTokenExpiry');
     localStorage.removeItem('refreshTokenExpiry');
-    const refreshToken = localStorage.getItem('refreshToken');
-    const navigate = useNavigate();
-
+    localStorage.removeItem('refreshTokens');
     try {
-        const response = await api.get('/auth/logout', { data: { refreshToken } });
+        const response = await api.post('/auth/logout', { refreshToken });
         toast.success(response.data.message);
-        navigate('/login');
+        return;
     } catch (error) {
         toast.error('Error logging out');
+    } finally {
+        navigate('/login');
     }
 };
 
