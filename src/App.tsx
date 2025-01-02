@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Loader from './components/Loader';
 import { ToastContainer } from 'react-toastify';
+import EditPost from './pages/EditPost';
 
 const App: React.FC = () => {
 
@@ -37,6 +38,7 @@ const App: React.FC = () => {
             <Route path="/create-post" element={<CreatePost />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/edit-post/:postId" element={<EditPost />} />
         </Routes>
         <ToastContainer />
     </Router>

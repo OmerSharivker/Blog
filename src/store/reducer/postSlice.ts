@@ -14,6 +14,7 @@ interface Post {
     comments: number | null;
     userImg: string | null;
     postImg: string | null;
+    ownerId: string | null;
 }
 
 // Define the state type for the slice
@@ -73,6 +74,45 @@ export const create_post = createAsyncThunk(
 );
 
 
+interface UpdatePostParams {
+    postData: Post | null;
+    postId: string | null;
+}
+
+export const update_post = createAsyncThunk(
+    'posts/update_post',
+    async ({ postData, postId }: UpdatePostParams, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const token = await getAccessToken();
+            const { data } = await api.put(`/posts/${postId}`, postData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return fulfillWithValue(data);
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
+
+export const delete_post = createAsyncThunk(
+    'posts/update_post',
+    async ( postId : UpdatePostParams, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const token = await getAccessToken();
+            const { data } = await api.delete(`/posts/${postId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return fulfillWithValue(data);
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
 
 export const postSlice = createSlice({
     name: 'posts',
@@ -95,21 +135,24 @@ export const postSlice = createSlice({
         })
         .addCase(setLike.fulfilled, (state, { payload }) => {
             const post = state.posts.find(post => post._id === payload.post._id);
-            console.log(post);
+        
             if (post) {
                 post.numLikes = payload.post.numLikes;
             }
             state.successMessage = payload.message;
         })
-        .addCase(create_post.fulfilled, (state, { payload }) => {
-            state.successMessage = payload.message;
- 
-        })
-        .addCase(create_post.rejected, (state, { payload }) => {
+        .addCase(create_post.rejected, (state) => {
             state.errorMessage = "Error creating post";
         })
-        
-
+        // .addCase(update_post.rejected, (state) => {
+        //     state.errorMessage = "Error creating post";
+        // })
+        .addCase(delete_post.fulfilled, (state) => {
+            state.successMessage = "Post deleted successfully";
+        })
+        .addCase(delete_post.rejected, (state) => {
+            state.errorMessage = "Error deleting post";
+        })
     }
 
 })
