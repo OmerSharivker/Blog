@@ -1,5 +1,6 @@
 import {  createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../api/api';
+import { getAccessToken } from '../../utils/authUtils';
 
 interface UserState {
     email: string;
@@ -37,6 +38,23 @@ export const login = createAsyncThunk(
     }
 );
 
+export const getUserInfo =  createAsyncThunk(
+    'user/getUserInfo',
+    async (_, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const token = await getAccessToken();
+            const { data } = await api.get('/auth/user', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return fulfillWithValue(data);
+        } catch (error : any) {
+            return rejectWithValue(error.response.data.error || 'Failed to get user info');
+        }
+    }
+);
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -59,7 +77,6 @@ const userSlice = createSlice({
         builder
         .addCase(register.fulfilled, (state, { payload }) => {
             state.successMessage = payload.message; 
-            state.image = payload.image;
         })
         .addCase(register.rejected, (state, { payload }) => {
             state.errorMessage = payload as string;
@@ -70,13 +87,17 @@ const userSlice = createSlice({
             localStorage.setItem('refreshTokens', payload.refreshToken);
             localStorage.setItem('accessTokenExpiry', (Date.now() + 3600000).toString());
             localStorage.setItem('refreshTokenExpiry', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
-           
-
+            state.userName = payload.user.userName;
+            state.image = payload.user.image || null;
         })
         .addCase(login.rejected, (state, { payload }) => {
             state.errorMessage = payload as string;
-        });
-    },
+        })
+        .addCase(getUserInfo.fulfilled, (state, { payload }) => {
+            state.userName = payload.userName;
+            state.image = payload.image;
+        })
+    }
 });
 
 export const {messageClear} = userSlice.actions;
