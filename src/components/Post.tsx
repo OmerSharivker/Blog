@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { get_posts, setLike } from '../store/reducer/postSlice';
 import { AppDispatch, RootState } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
+import { local } from '../api/api';
 
 const Post: React.FC = () => {
     const { posts } = useSelector((state: RootState) => state.posts);
     const dispatch = useDispatch<AppDispatch>();
-
+   
     const handleLike = (postId: string) => {
         dispatch(setLike(postId));
     };
@@ -23,10 +24,10 @@ const Post: React.FC = () => {
                     <button className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded">Edit</button>
                     
                     {/* Post Image */}
-                    {post.img && (
+                    {post.postImg && (
                         <div className="w-full h-48 bg-gray-200">
                             <img
-                                src={post.img}
+                                src={`${local}${post.postImg}`}
                                 alt={post.title}
                                 className="w-full h-full object-cover"
                             />
@@ -46,7 +47,10 @@ const Post: React.FC = () => {
                     {/* Post Content */}
                     <div className="p-4">
                         <p className="mt-2 text-gray-600 font-semibold">{post.title}</p>
-                        <p className="mt-4 text-gray-800">{post.content}</p>
+                        <div
+                            className="mt-4 text-gray-800"
+                            dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
                     </div>
 
                     {/* Post Footer */}
