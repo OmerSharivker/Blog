@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../api/api';
+import { getAccessToken } from '../../utils/authUtils';
 
 
 // Define the Post type based on your API response structure
@@ -37,9 +38,10 @@ export const setLike = createAsyncThunk(
     'posts/setLike',
     async (postId: string, { rejectWithValue, fulfillWithValue }) => {
         try {
+            const token = await getAccessToken();
             const { data } = await api.put(`/posts/like/${postId}`, null, {
                 headers: {
-                    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzNkYjMxNTQ2ZWFkMTdhMzc0NjNjYiIsImlhdCI6MTczNTY1NTA5MiwiZXhwIjoxNzM1NjU4NjkyfQ.IzdI5wCf0LwuKKm9p1p9yuJCYqVKk9fZ6CtL6qwS9Yk"
+                    Authorization: `Bearer ${token}`
                 }
             });
             return fulfillWithValue(data);
