@@ -3,40 +3,62 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { get_comments, get_post, add_comment, messageClear } from '../store/reducer/commentSlice';
+import { add_comment, delete_comment, get_comments, get_post, messageClear, update_comment } from '../store/reducer/commentSlice';
 import { AppDispatch, RootState } from '../store/store';
 import { toast } from 'react-toastify';
 import { local } from '../api/api';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 
 const Comments: React.FC = () => {
     const { postId } = useParams<{ postId: string }>();
     const dispatch = useDispatch<AppDispatch>();
     const { posts, comments, errorMessage, successMessage } = useSelector((state: RootState) => state.comments);
+    const { userId } = useSelector((state: RootState) => state.user);
     const [newComment, setNewComment] = useState('');
+    const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 
     useEffect(() => {
         if (postId) {
             dispatch(get_post(postId));
             dispatch(get_comments(postId));
         }
-    }, [dispatch, postId]);
+    }, [dispatch, postId,comments]);
 
-    const handleAddComment = () => {
+    const handleAddOrUpdateComment = () => {
         if (postId && newComment.trim()) {
-            dispatch(add_comment({ postId, content: newComment }));
+            if (editingCommentId) {
+                dispatch(update_comment({ commentId: editingCommentId, content: newComment }));
+                setEditingCommentId(null);
+            } else {
+                dispatch(add_comment({ postId, content: newComment }));
+            }
             setNewComment('');
+        }
+    };
+
+    const handleEditComment = (commentId: string, content: string) => {
+        setEditingCommentId(commentId);
+        setNewComment(content);
+    };
+
+    const handleDeleteComment = (commentId: string) => {
+        if (window.confirm('Are you sure you want to delete this comment?')) {
+            dispatch(delete_comment(commentId));
         }
     };
 
     useEffect(() => {
         if (successMessage) {
-            toast.success(successMessage);
-            dispatch(messageClear());
+            toast.success(successMessage)
+            dispatch(messageClear()) 
+      }
+      if (errorMessage) {
+          toast.error(errorMessage)
+          dispatch(messageClear())
         }
-    }, [successMessage, dispatch]);
-
+    },[successMessage,dispatch,errorMessage])
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-gray-100">
             <Header />
             <main className="flex-grow p-4">
                 {errorMessage && <div className="text-red-500 mb-4">{errorMessage}</div>}
@@ -44,7 +66,7 @@ const Comments: React.FC = () => {
                     <div className="flex items-center p-4">
                         {posts && (
                             <>
-                                <img src={posts.userImg} alt={posts.userName} className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0" />
+                                <img src={`${local}${posts.userImg}`} alt={posts.userName} className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0" />
                                 <h2 className="ml-4 text-xl font-bold">{posts.userName}</h2>
                             </>
                         )}
@@ -74,10 +96,26 @@ const Comments: React.FC = () => {
                     <h3 className="text-lg font-semibold mb-2">Comments</h3>
                     <div className="space-y-4">
                         {comments.map(comment => (
-                            <div key={comment._id} className="bg-gray-100 p-4 rounded-lg shadow-md">
+                            <div key={comment._id} className="bg-gray-100 p-4 rounded-lg shadow-md relative">
                                 <div className="flex items-center">
                                     <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0"></div>
                                     <h4 className="ml-3 text-md font-semibold">{comment.userName}</h4>
+                                    {comment.ownerId === userId && (
+                                        <div className="absolute top-2 right-2 flex space-x-2">
+                                            <button
+                                                className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition"
+                                               onClick={() => handleEditComment(comment._id, comment.content)}
+                                            >
+                                                <FaEdit />
+                                            </button>
+                                            <button
+                                                className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
+                                                 onClick={() => handleDeleteComment(comment._id)}
+                                            >
+                                                <FaTrashAlt />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                                 <p className="mt-2 text-gray-600">{comment.content}</p>
                             </div>
@@ -91,10 +129,11 @@ const Comments: React.FC = () => {
                             placeholder="Add a comment..."
                         />
                         <button
-                            onClick={handleAddComment}
-                            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+                            onClick={handleAddOrUpdateComment}
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
+                       
                         >
-                            Add Comment
+                            {editingCommentId ? 'Update Comment' : 'Add Comment'}
                         </button>
                     </div>
                 </div>

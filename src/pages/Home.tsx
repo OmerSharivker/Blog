@@ -16,13 +16,17 @@ const Home: React.FC = () => {
     };
 
     const dispatch = useDispatch<AppDispatch>();
-    const { successMessage } = useSelector((state: RootState) => state.posts);
+    const { successMessage,errorMessage } = useSelector((state: RootState) => state.posts);
     useEffect(() => {
         if (successMessage) {
             toast.success(successMessage)
             dispatch(messageClear()) 
       }
-    },[successMessage])
+      if (errorMessage) {
+          toast.error(errorMessage)
+          dispatch(messageClear())
+        }
+    },[successMessage,dispatch,errorMessage])
 
 
  
@@ -33,7 +37,7 @@ const Home: React.FC = () => {
             <main className="flex-grow p-4 flex flex-col items-center">
                 <button
                     onClick={handleCreatePost}
-                    className="mb-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+                    className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
                 >
                     Create Post
                 </button>

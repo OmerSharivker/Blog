@@ -3,6 +3,7 @@ import api from '../../api/api';
 import { getAccessToken } from '../../utils/authUtils';
 
 interface UserState {
+    userId : string;
     email: string;
     password: string;
     accessToken: string;
@@ -43,6 +44,7 @@ export const getUserInfo =  createAsyncThunk(
     async (_, { rejectWithValue, fulfillWithValue }) => {
         try {
             const token = await getAccessToken();
+         
             const { data } = await api.get('/auth/user', {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -66,12 +68,23 @@ const userSlice = createSlice({
         userName: '',
         errorMessage: '',
         successMessage: '',
+        userId: ''
     } as UserState,
     reducers: {       
         messageClear: (state) => {
             state.errorMessage = "";
             state.successMessage = "";
         },
+        logoutUser: (state) => {
+            state.email = '';
+            state.password = '';
+            state.accessToken = '';
+            state.refreshTokens = [];
+            state.image = '';
+            state.userName = 'Guest';
+            state.successMessage = "";
+            state.userId = '';
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -96,9 +109,17 @@ const userSlice = createSlice({
         .addCase(getUserInfo.fulfilled, (state, { payload }) => {
             state.userName = payload.userName;
             state.image = payload.image;
+            state.userId = payload.userId;
         })
+        .addCase(getUserInfo.rejected, (state) => {
+            state.userName = '';
+            state.image = '';
+            state.userId = '';
+        })
+     
+    
     }
 });
 
-export const {messageClear} = userSlice.actions;
+export const {messageClear,logoutUser} = userSlice.actions;
 export default userSlice.reducer;

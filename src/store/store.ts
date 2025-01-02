@@ -4,6 +4,7 @@ import postSlice from './reducer/postSlice';
 import commentsSlice from './reducer/commentSlice';
 import userSlice from '../store/reducer/userSlice';
 
+
 const store = configureStore({
     reducer: {
         user: userSlice,
