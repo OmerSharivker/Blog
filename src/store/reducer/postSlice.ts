@@ -5,13 +5,15 @@ import { getAccessToken } from '../../utils/authUtils';
 
 // Define the Post type based on your API response structure
 interface Post {
-    _id: string;
+    _id: string | null;
     title: string;
     content: string;
     img: string;
     userName: string;
-    numLikes: number;
-    comments: number;
+    numLikes: number | null;
+    comments: number | null;
+    userImg: string | null;
+    postImg: string | null;
 }
 
 // Define the state type for the slice
@@ -51,6 +53,27 @@ export const setLike = createAsyncThunk(
     }
 );
 
+
+
+export const create_post = createAsyncThunk(
+    'posts/create_post',
+    async (postData: Post, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const token = await getAccessToken();
+            const { data } = await api.post('/posts', postData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return fulfillWithValue(data);
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
+
+
 export const postSlice = createSlice({
     name: 'posts',
     initialState: {
@@ -77,6 +100,13 @@ export const postSlice = createSlice({
                 post.numLikes = payload.post.numLikes;
             }
             state.successMessage = payload.message;
+        })
+        .addCase(create_post.fulfilled, (state, { payload }) => {
+            state.successMessage = payload.message;
+ 
+        })
+        .addCase(create_post.rejected, (state, { payload }) => {
+            state.errorMessage = "Error creating post";
         })
         
 
