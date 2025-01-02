@@ -3,15 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { get_comments, get_post,add_comment, messageClear } from '../store/reducer/commentSlice';
+import { get_comments, get_post, add_comment, messageClear } from '../store/reducer/commentSlice';
 import { AppDispatch, RootState } from '../store/store';
 import { toast } from 'react-toastify';
+import { local } from '../api/api';
 
 const Comments: React.FC = () => {
-    const { postId } = useParams();
+    const { postId } = useParams<{ postId: string }>();
     const dispatch = useDispatch<AppDispatch>();
-    const { posts,comments, errorMessage,successMessage } = useSelector((state: RootState) => state.comments);
+    const { posts, comments, errorMessage, successMessage } = useSelector((state: RootState) => state.comments);
     const [newComment, setNewComment] = useState('');
+
     useEffect(() => {
         if (postId) {
             dispatch(get_post(postId));
@@ -19,21 +21,19 @@ const Comments: React.FC = () => {
         }
     }, [dispatch, postId]);
 
-
     const handleAddComment = () => {
         if (postId && newComment.trim()) {
             dispatch(add_comment({ postId, content: newComment }));
             setNewComment('');
         }
     };
-      
-        useEffect(() => {
-            if (successMessage) {
-                toast.success(successMessage)
-                dispatch(messageClear()) 
-          }
-        },[successMessage])
-    
+
+    useEffect(() => {
+        if (successMessage) {
+            toast.success(successMessage);
+            dispatch(messageClear());
+        }
+    }, [successMessage, dispatch]);
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -44,16 +44,28 @@ const Comments: React.FC = () => {
                     <div className="flex items-center p-4">
                         {posts && (
                             <>
-                                <img src={posts.img} alt={posts.userName} className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0" />
+                                <img src={posts.userImg} alt={posts.userName} className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0" />
                                 <h2 className="ml-4 text-xl font-bold">{posts.userName}</h2>
                             </>
                         )}
                     </div>
+                    {posts && posts.postImg && (
+                        <div className="w-full h-48 bg-gray-200">
+                            <img
+                                src={`${local}${posts.postImg}`}
+                                alt={posts.title}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    )}
                     <div className="p-4">
                         {posts && (
                             <>
                                 <p className="mt-2 text-gray-600">{posts.title}</p>
-                                <p className="mt-4 text-gray-800">{posts.content}</p>
+                                <div
+                                    className="mt-4 text-gray-800"
+                                    dangerouslySetInnerHTML={{ __html: posts.content }}
+                                />
                             </>
                         )}
                     </div>
@@ -70,7 +82,7 @@ const Comments: React.FC = () => {
                                 <p className="mt-2 text-gray-600">{comment.content}</p>
                             </div>
                         ))}
-                             </div>
+                    </div>
                     <div className="mt-4">
                         <textarea
                             value={newComment}
