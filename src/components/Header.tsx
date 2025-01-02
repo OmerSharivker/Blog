@@ -6,7 +6,7 @@ function Header() {
             <div className="container mx-auto flex justify-between items-center">
                 <div className="flex items-center space-x-4">
                     <img
-                        src="https://via.placeholder.com/40"
+                        src='src/assets/images/blog.png'
                         alt="Logo"
                         className="w-10 h-10"
                     />
@@ -17,7 +17,7 @@ function Header() {
                 </div>
                 <div className="flex items-center">
                     <img
-                        src="https://via.placeholder.com/40"
+                        src="http://localhost:3000/image.png"
                         alt="User"
                         className="w-10 h-10 rounded-full"
                     />
