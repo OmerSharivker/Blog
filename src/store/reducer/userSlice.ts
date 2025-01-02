@@ -70,6 +70,8 @@ const userSlice = createSlice({
             localStorage.setItem('refreshTokens', payload.refreshToken);
             localStorage.setItem('accessTokenExpiry', (Date.now() + 3600000).toString());
             localStorage.setItem('refreshTokenExpiry', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
+           
+
         })
         .addCase(login.rejected, (state, { payload }) => {
             state.errorMessage = payload as string;
