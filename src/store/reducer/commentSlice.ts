@@ -12,6 +12,8 @@ interface Post {
     userName: string;
     numLikes: number;
     comments: number;
+    userImg: string;
+    postImg: string;
 }
 interface Comments {
     _id: string;
@@ -89,7 +91,9 @@ export const commentSlice = createSlice({
             img: '',
             userName: '',
             numLikes: 0,
-            comments: 0
+            comments: 0,
+            userImg: '',
+            postImg: ''
         },
         comments: [],
         errorMessage : '',
