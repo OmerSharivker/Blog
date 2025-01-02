@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../api/api';
+import { getAccessToken } from '../../utils/authUtils';
 
 
 
@@ -35,9 +36,10 @@ export const get_comments = createAsyncThunk(
     'comment/get_comments',
     async (postId: string, { rejectWithValue, fulfillWithValue }) => {
         try {
+            const token = await getAccessToken();
             const response = await api.get(`/comment/get-all-comments/${postId}`, {
                 headers: {
-                    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzQxNzI5MWYwYTQ0M2ZlMDc3OGU4MSIsImlhdCI6MTczNTY2MTM2NSwiZXhwIjoxNzM1NjY0OTY1fQ.PkYGBZP0LMHdDnrChdh5TefuUnQFs4WbsZLGymtRWDw"
+                    Authorization: `Bearer ${token}`
                 }
             });
             return fulfillWithValue(response.data);
@@ -64,9 +66,10 @@ export const add_comment = createAsyncThunk(
     'comment/add_comment',
     async ({ postId, content }: { postId: string; content: string }, { rejectWithValue, fulfillWithValue }) => {
         try {
+            const token = await getAccessToken();
             const response = await api.post(`/comment`, { postId,content }, {
                 headers: {
-                    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzQxNzI5MWYwYTQ0M2ZlMDc3OGU4MSIsImlhdCI6MTczNTY2MjY3NywiZXhwIjoxNzM1NjY2Mjc3fQ.l0rafYalzL4ZN_Dy6mAdFnd9lSEZ5kv-hKRVX4TBUUA"
+                    Authorization: `Bearer ${token}`
                 }
             });
             return fulfillWithValue(response.data);
