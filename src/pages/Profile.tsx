@@ -1,121 +1,215 @@
-// // filepath: /Users/omersharivker/dev/front_blog/src/pages/Profile.tsx
-// import React, { useState } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { RootState } from '../store/store';
-// import { toast } from 'react-toastify';
-// import Header from '../components/Header';
-// import Footer from '../components/Footer';
-// import Post from '../components/Post';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../store/store';
+import { toast } from 'react-toastify';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import MyPost from '../components/MyPost';
+import { messageClear } from '../store/reducer/postSlice';
+import api, { local } from '../api/api';
+import { getAccessToken } from '../utils/authUtils';
+import { update_profile } from '../store/reducer/userSlice';
+import { Link, useNavigate } from 'react-router-dom';
 
-// const Profile: React.FC = () => {
-//     const dispatch = useDispatch();
-//     const userName = useSelector((state: RootState) => state.user.name);
-//     const userImage = useSelector((state: RootState) => state.user.image);
-//     const [isEditing, setIsEditing] = useState(false);
-//     const [newName, setNewName] = useState(userName);
+const Profile: React.FC = () => {
+    const dispatch: AppDispatch = useDispatch();
+    const { userName } = useSelector((state: RootState) => state.user);
+    const { posts } = useSelector((state: RootState) => state.posts);
+    const userImage = useSelector((state: RootState) => state.user.image);
+    const { successMessage, errorMessage } = useSelector((state: RootState) => state.posts);
+    const [isEditing, setIsEditing] = useState(false);
+    const navigate = useNavigate();
+    const [newName, setNewName] = useState(userName);
+    const [newImage, setNewImage] = useState<File | string |null>(userImage);
+    const [previewImage, setPreviewImage] = useState<string>(local + userImage);
 
-//     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//         setNewName(e.target.value);
-//     };
+    useEffect(() => {
+        // Redirect to login if no token exists
+        if (!localStorage.getItem('accessToken')) {
+            toast.error('You must log in to access this page.');
+            navigate('/login');
+        }
+    }, [navigate]);
 
-//     const handleNameSubmit = () => {
-//         dispatch(setName(newName));
-//         toast.success('Username updated successfully!');
-//         setIsEditing(false);
-//     };
 
-//     const handleCancelEdit = () => {
-//         setNewName(userName);
-//         setIsEditing(false);
-//     };
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewName(e.target.value);
+    };
 
-//     const handleImageChange = () => {
-//         // Logic to change the user image
-//         console.log('Change user image');
-//         toast.info('User image change functionality is not implemented yet.');
-//     };
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setNewImage(file);
+            setPreviewImage(URL.createObjectURL(file)); // Live preview of the image
+        }
+    };
 
-//     return (
-//         <div className="min-h-screen flex flex-col">
-//             <Header />
-//             <main className="flex-grow p-4 flex justify-center">
-//                 <div className="flex flex-col md:flex-row w-full max-w-5xl">
-//                     <div className="md:w-1/3 flex flex-col items-center md:items-end mb-8 md:mb-0">
-//                         <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
-//                             <h2 className="text-2xl font-bold mb-4">{userName}</h2>
-//                             <div className="relative mb-4">
-//                                 <img
-//                                     src={userImage}
-//                                     alt="User"
-//                                     className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
-//                                 />
-//                                 <button
-//                                     onClick={handleImageChange}
-//                                     className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full"
-//                                 >
-//                                     <svg
-//                                         xmlns="http://www.w3.org/2000/svg"
-//                                         fill="none"
-//                                         viewBox="0 0 24 24"
-//                                         stroke="currentColor"
-//                                         className="w-6 h-6"
-//                                     >
-//                                         <path
-//                                             strokeLinecap="round"
-//                                             strokeLinejoin="round"
-//                                             strokeWidth={2}
-//                                             d="M15.232 5.232l3.536 3.536M9 13h3l7-7a2.828 2.828 0 10-4-4l-7 7v3zm0 0L3 21h3l3-3z"
-//                                         />
-//                                     </svg>
-//                                 </button>
-//                             </div>
-//                             {isEditing ? (
-//                                 <div className="w-full">
-//                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="userName">
-//                                         Change Name
-//                                     </label>
-//                                     <input
-//                                         id="userName"
-//                                         type="text"
-//                                         value={newName}
-//                                         onChange={handleNameChange}
-//                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                         placeholder="Enter your name"
-//                                     />
-//                                     <div className="flex justify-between mt-2">
-//                                         <button
-//                                             onClick={handleNameSubmit}
-//                                             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-//                                         >
-//                                             Save
-//                                         </button>
-//                                         <button
-//                                             onClick={handleCancelEdit}
-//                                             className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-//                                         >
-//                                             Cancel
-//                                         </button>
-//                                     </div>
-//                                 </div>
-//                             ) : (
-//                                 <button
-//                                     onClick={() => setIsEditing(true)}
-//                                     className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-//                                 >
-//                                     Edit Name
-//                                 </button>
-//                             )}
-//                         </div>
-//                     </div>
-//                     <div className="md:w-2/3 md:ml-4">
-//                         <h2 className="text-xl font-bold mb-4">User Posts</h2>
-//                         <Post />
-//                     </div>
-//                 </div>
-//             </main>
-//             <Footer />
-//         </div>
-//     );
-// };
+    const handleSaveChanges = async () => {
+        if (newName.trim() === '') {
+            toast.error('Name cannot be empty!');
+            return;
+        }
+        try {
+            const formData = new FormData();
+            if(newImage === userImage){
+              
+                const userData = {
+                    userName: newName,
+                    image: userImage,
+                }
+                dispatch(update_profile(userData));
+                toast.success('Profile updated successfully!');
+               
+            }
+            else{
+            if (newImage) {
+                console.log('newImage:', newImage);
+                formData.append('photo', newImage);
+            }
+            const token = await getAccessToken();
+            const photoResponse = await api.post('/posts/upload', formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                },
+            });
+            const photoUrl = photoResponse.data.url;
+            const userData = {
+                userName: newName,
+                image: photoUrl,
+            }
+            dispatch(update_profile(userData));
+            toast.success('Profile updated successfully!');
+        }
+        } catch (error) {
+            console.error('Error uploading profile image:', error);
+            toast.error('Failed to upload profile image');
+        }
+  
+        setIsEditing(false);
+    };
 
-// export default Profile;
+    const handleCancelChanges = () => {
+        setNewName(userName);
+        setPreviewImage(local + userImage);
+        setNewImage(null);
+        setIsEditing(false);
+    };
+
+    useEffect(() => {
+        if (successMessage) {
+            toast.success(successMessage);
+            dispatch(messageClear());
+        }
+        if (errorMessage) {
+            toast.error(errorMessage);
+            dispatch(messageClear());
+        }
+    }, [successMessage, errorMessage, dispatch]);
+
+    return (
+        
+        <div className="min-h-screen flex flex-col bg-gray-100">
+            <Header />
+            <main className="flex-grow p-4 flex justify-center ">
+                <div className="flex flex-col md:flex-row w-full max-w-5xl gap-6">
+                    {/* User Details Section */}
+                    <div className="md:w-1/4 bg-white shadow-lg rounded-lg p-6 h-[400px]
+                     ">
+                        <div className="flex flex-col items-center">
+                            <div className="relative">
+                                <img
+                                    src={previewImage}
+                                    alt="User"
+                                  className="w-[200px] h-[200px] rounded-full object-cover border-[10px] bg-gradient-to-r from-blue-500 to-purple-500 p-1 shadow-lg ring-4 ring-offset-4 ring-offset-gray-100 ring-blue-300 "
+                                />
+                                {isEditing && (
+                                    <label className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                        />
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            className="w-6 h-6"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15.232 5.232l3.536 3.536M9 13h3l7-7a2.828 2.828 0 10-4-4l-7 7v3zm0 0L3 21h3l3-3z"
+                                            />
+                                        </svg>
+                                    </label>
+                                )}
+                            </div>
+                            {isEditing ? (
+                                <div className="w-full mt-4">
+                                    <input
+                                        type="text"
+                                        value={newName}
+                                        onChange={handleNameChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Enter your name"
+                                    />
+                                    <div className="flex justify-between mt-4">
+                                        <button
+                                            onClick={handleSaveChanges}
+                                             className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            onClick={handleCancelChanges}
+                                            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <h2 className="text-2xl font-bold mt-4">{userName}</h2>
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                            className="bg-gradient-to-r mt-3 from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
+                                    >
+                                        Edit Profile
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+
+                    {/* User Posts Section */}
+                    <div className="md:w-3/4 bg-white shadow-lg rounded-lg p-6">
+                        <h2 className="text-xl font-bold mb-4">Your Posts</h2>
+                    {posts.length === 0 || userName == 'Guest' ? (
+                        <div className="flex justify-center items-center h-full">
+                            <Link to="/create-post">
+                                <button
+                                    className="bg-gradient-to-r mt-3 from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
+                                >
+                                    Create a Post
+                                </button>
+                            </Link>
+                        </div>
+                    ) : (
+                        <MyPost />
+                    )}
+                       
+                    </div>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    );
+};
+
+export default Profile;

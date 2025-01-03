@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { add_comment, delete_comment, get_comments, get_post, messageClear, update_comment } from '../store/reducer/commentSlice';
@@ -16,7 +16,7 @@ const Comments: React.FC = () => {
     const { userId } = useSelector((state: RootState) => state.user);
     const [newComment, setNewComment] = useState('');
     const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-
+    const navigate=useNavigate();
     useEffect(() => {
         if (postId) {
             dispatch(get_post(postId));
@@ -25,6 +25,11 @@ const Comments: React.FC = () => {
     }, [dispatch, postId,comments]);
 
     const handleAddOrUpdateComment = () => {
+            
+                if (!localStorage.getItem('accessToken')) {
+                    toast.error('You must log in to add a comment.');
+                    navigate('/login');
+                }
         if (postId && newComment.trim()) {
             if (editingCommentId) {
                 dispatch(update_comment({ commentId: editingCommentId, content: newComment }));
