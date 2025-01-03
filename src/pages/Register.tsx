@@ -38,7 +38,7 @@ const Register: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-gray-100">
             <Header />
             <main className="flex-grow p-4 flex justify-center items-center pb-20">
                 <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">

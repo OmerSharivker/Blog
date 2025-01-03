@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../utils/authUtils';
-import { useNavigate } from 'react-router-dom';
-import { AppDispatch } from '../store/store';
+import { AppDispatch, RootState } from '../store/store';
 import { getUserInfo, logoutUser } from '../store/reducer/userSlice';
 import { local } from '../api/api';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Header() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-    let userName = useSelector((state: any) => state.user.userName);
-    let image = useSelector((state: any) => state.user.image);
+    const {userName} = useSelector((state: RootState) => state.user);
+    let image = useSelector((state: RootState) => state.user.image);
     image = image ? `${local}${image}` : `${local}/image.png`;
     const isLogIn = !!localStorage.getItem('accessToken');
 
@@ -45,12 +45,16 @@ function Header() {
 
                 {/* Right: User Info */}
                 <div className="flex items-center justify-end w-1/4 space-x-4">
-                    <span className="text-white text-lg">{userName}</span>
-                    <img
-                        src={image}
-                        alt="User"
-                        className="w-10 h-10 rounded-full"
-                    />
+                <Link to="/profile" className="text-white text-lg">
+                        {userName}
+                    </Link>
+                    <Link to="/profile">
+                        <img
+                            src={image}
+                            alt="User"
+                            className="w-10 h-10 rounded-full"
+                        />
+                    </Link>
                     <button
                         onClick={async () => {
                             if (sign === "Log In") {
