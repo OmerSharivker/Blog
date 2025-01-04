@@ -25,7 +25,7 @@ const getAccessToken = async (): Promise<string | null> => {
 };
 
 // Function to refresh access token if expired
-const refreshAccessToken = async (): Promise<string | null> => {
+ const  refreshAccessToken = async (): Promise<string | null> => {
     const refreshTokenExpiry = localStorage.getItem('refreshTokenExpiry');
     const refreshToken = localStorage.getItem('refreshTokens');
     
@@ -36,11 +36,14 @@ const refreshAccessToken = async (): Promise<string | null> => {
     }
 
     try {
-        const response = await api.get('/auth/refreshToken', { data: { refreshToken } });
+        const response = await api.get('/auth/refreshToken', {
+            params: { refreshToken }
+        });
 
         localStorage.setItem('accessToken', response.data.token);
         const newExpiryTime = Date.now() + 3600000; // 1 hour from now
         localStorage.setItem('accessTokenExpiry', newExpiryTime.toString());
+      
         return response.data.token;
     } catch (error) {
         //logout user

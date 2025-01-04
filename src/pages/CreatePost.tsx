@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ReactQuill from 'react-quill';
@@ -11,12 +10,7 @@ import api, { local } from '../api/api';
 import { getAccessToken } from '../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
-import OpenAI from 'openai';
 
-
-// const openai = new OpenAI({
-
-// });
 
 const CreatePost: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -53,34 +47,28 @@ const CreatePost: React.FC = () => {
     };
 
     const generateContent = async () => {
-        // if (!title.trim()) {
-        //     toast.error('Please enter a title to generate content');
-        //     return;
-        // }
+        if (!title.trim()) {
+            toast.error('Please enter a title to generate content');
+            return;
+        }
 
-        // setAiLoading(true);
+        setAiLoading(true);
 
-        // try {
-        //     const response = await openai.completions.create({
-        //         model: 'gpt-3.5-turbo-instruct',
-        //         prompt: `Write a blog post based on the following title: "${title}"`,
-        //         max_tokens: 200, 
-        //         temperature: 0.7,
-        //     });
-
-        //     const generatedContent = response.choices[0]?.text?.trim();
-        //     if (generatedContent) {
-        //         setContent(generatedContent);
-        //         toast.success('Content generated successfully!');
-        //     } else {
-        //         toast.error('Failed to generate content. Try again.');
-        //     }
-        // } catch (error) {
-        //     console.error('Error generating content:', error);
-        //     toast.error('Failed to generate content. Try again.');
-        // } finally {
-        //     setAiLoading(false);
-        // }
+        try {
+            const response = await api.post('/posts/ai', { title });
+            const generatedContent = response.data.content.trim()
+            if (generatedContent) {
+                setContent(generatedContent);
+                toast.success('Content generated successfully!');
+            } else {
+                toast.error('Failed to generate content. Try again.');
+            }
+        } catch (error) {
+            console.error('Error generating content:', error);
+            toast.error('Failed to generate content. Try again.');
+        } finally {
+            setAiLoading(false);
+        }
     };
 
    
