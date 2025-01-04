@@ -9,9 +9,9 @@ import { FaEdit, FaHeart, FaRegCommentDots, FaTrashAlt } from 'react-icons/fa'; 
 import Pagination from './Pagination';
 
 const Post: React.FC = () => {
-    const { posts,  totalPages } = useSelector((state: RootState) => state.posts);
+    const { posts,  totalPages,currentPage } = useSelector((state: RootState) => state.posts);
     const { userId } = useSelector((state: RootState) => state.user);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPagee, setCurrentPage] = useState(currentPage);
     const [postsPerPage] = useState(2);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ const Post: React.FC = () => {
     };
 
     useEffect(() => {
-        dispatch(get_posts({ page: currentPage, limit: postsPerPage }));
+        dispatch(get_posts({ page: currentPagee, limit: postsPerPage }));
     }, [dispatch, currentPage, postsPerPage,posts]);
 
     const currentPosts = posts
