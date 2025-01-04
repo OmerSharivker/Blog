@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { delete_post, get_posts, setLike } from '../store/reducer/postSlice';
+import { delete_post, get_posts_byId, setLike } from '../store/reducer/postSlice';
 import { AppDispatch, RootState } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { local } from '../api/api';
 import parse from 'html-react-parser';
 import { FaEdit, FaHeart, FaRegCommentDots, FaTrashAlt } from 'react-icons/fa'; // Importing Font Awesome icons
-import Pagination from './Pagination';
 
-const Post: React.FC = () => {
-    const { posts,  totalPages } = useSelector((state: RootState) => state.posts);
-    const { userId } = useSelector((state: RootState) => state.user);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [postsPerPage] = useState(2);
+const MyPost: React.FC = () => {
+    const { posts } = useSelector((state: RootState) => state.posts);
+    const { userId  } = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
@@ -29,20 +26,14 @@ const Post: React.FC = () => {
     };
 
     useEffect(() => {
-        dispatch(get_posts({ page: currentPage, limit: postsPerPage }));
-    }, [dispatch, currentPage, postsPerPage,posts]);
-
-    const currentPosts = posts
-   
+        dispatch(get_posts_byId());
+    }, [dispatch,posts]);
 
 
-    const handlePageChange = (pageNumber: number) => {
-        setCurrentPage(pageNumber);
-        window.scrollTo(0, 0);
-    };
+
     return (
         <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto">
-            {currentPosts.map(post => (
+            {posts.map(post => (
                 <div key={post._id} className="bg-white shadow-md rounded-lg overflow-hidden relative">
                        {post.ownerId === userId && (
                         <div className="absolute top-2 right-2 flex space-x-2">
@@ -113,14 +104,8 @@ const Post: React.FC = () => {
                     </div>
                 </div>
             ))}
-                   <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-        />
         </div>
     );
 };
 
-export default Post;
-
+export default MyPost;

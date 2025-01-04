@@ -57,6 +57,27 @@ export const getUserInfo =  createAsyncThunk(
     }
 );
 
+
+
+export const update_profile =  createAsyncThunk(
+    'user/update_profile',
+    async (userData: { userName: string; image: unknown }, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const token = await getAccessToken();
+            const { data } = await api.post('/auth/user/update', userData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return fulfillWithValue(data);
+        } catch (error : any) {
+            return rejectWithValue(error.response.data.error || 'Failed to get user info');
+        }
+    }
+);
+=======
+
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -116,6 +137,16 @@ const userSlice = createSlice({
             state.image = '';
             state.userId = '';
         })
+
+        .addCase(update_profile.fulfilled, (state, { payload }) => {
+            state.image = payload.image;
+            state.userName = payload.userName;
+        })
+        .addCase(update_profile.rejected, (state) => {
+            state.errorMessage = "Error updating profile";
+        })
+=======
+
      
     
     }

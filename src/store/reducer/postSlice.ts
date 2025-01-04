@@ -21,15 +21,18 @@ interface Post {
 interface PostState {
     posts: Post[]; 
     errorMessage: string; 
+    currentPage: number;
+    totalPages: number;
+    totalPosts: number;
     successMessage: string; 
 }
 
 
 export const get_posts = createAsyncThunk(
     'posts/get_posts',
-    async (_, { rejectWithValue, fulfillWithValue }) => {
+    async ({ page, limit }: { page: number; limit: number }, { rejectWithValue, fulfillWithValue }) => {
         try {
-            const {data} = await api.get('/posts')
+            const {data} = await api.get(`/posts?page=${page}&limit=${limit}`);
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error)
@@ -114,10 +117,30 @@ export const delete_post = createAsyncThunk(
     }
 );
 
+export const get_posts_byId = createAsyncThunk(
+    'posts/get_posts_byId',
+    async (_, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const token = await getAccessToken();
+            const { data } = await api.get(`/posts/sender`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return fulfillWithValue(data);
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
 export const postSlice = createSlice({
     name: 'posts',
     initialState: {
         posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        totalPosts: 0,
         errorMessage : '',
         successMessage: '',
     } as PostState,
@@ -132,6 +155,9 @@ export const postSlice = createSlice({
         builder
         .addCase(get_posts.fulfilled, (state, { payload }) => {
             state.posts = payload.getPosts;
+            state.currentPage = payload.currentPage;
+            state.totalPages = payload.totalPages;
+            state.totalPosts = payload.totalPosts;
         })
         .addCase(setLike.fulfilled, (state, { payload }) => {
             const post = state.posts.find(post => post._id === payload.post._id);
@@ -152,6 +178,9 @@ export const postSlice = createSlice({
         })
         .addCase(delete_post.rejected, (state) => {
             state.errorMessage = "Error deleting post";
+        })
+        .addCase(get_posts_byId.fulfilled, (state, { payload }) => {
+            state.posts = payload.senderPosts;
         })
     }
 

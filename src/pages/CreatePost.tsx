@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -11,9 +11,35 @@ import api, { local } from '../api/api';
 import { getAccessToken } from '../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
 
+import { FaStar } from 'react-icons/fa';
+import OpenAI from 'openai';
+
+
+const openai = new OpenAI({
+
+});
+=======
+
+
 const CreatePost: React.FC = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+
+    const [photo, setPhoto] = useState<File | null>(null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false); // AI loading state
+    const { userName, image } = useSelector((state: RootState) => state.user);
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!localStorage.getItem('accessToken')) {
+            toast.error('You must log in to access this page.');
+            navigate('/login');
+        }
+    }, [navigate]);
+=======
     const [photo, setPhoto] = useState<File | null>(null); // File input for post image
     const [photoPreview, setPhotoPreview] = useState<string | null>(null); // Photo preview
     const [loading, setLoading] = useState(false);
@@ -33,6 +59,53 @@ const CreatePost: React.FC = () => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setPhoto(file);
+
+            setPhotoPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const generateContent = async () => {
+        if (!title.trim()) {
+            toast.error('Please enter a title to generate content');
+            return;
+        }
+
+        setAiLoading(true);
+
+        try {
+            const response = await openai.completions.create({
+                model: 'gpt-3.5-turbo-instruct',
+                prompt: `Write a blog post based on the following title: "${title}"`,
+                max_tokens: 200, 
+                temperature: 0.7,
+            });
+
+            const generatedContent = response.choices[0]?.text?.trim();
+            if (generatedContent) {
+                setContent(generatedContent);
+                toast.success('Content generated successfully!');
+            } else {
+                toast.error('Failed to generate content. Try again.');
+            }
+        } catch (error) {
+            console.error('Error generating content:', error);
+            toast.error('Failed to generate content. Try again.');
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
+   
+
+    const handleSubmit = async () => {
+        if (!title || !content || !photo) {
+            toast.error('Please fill in all fields and upload a photo');
+            return;
+        }
+
+        setLoading(true);
+        try {
+=======
             setPhotoPreview(URL.createObjectURL(file)); // Generate a preview URL for the photo
         }
     };
@@ -46,10 +119,37 @@ const CreatePost: React.FC = () => {
         setLoading(true);
         try {
             // Upload the photo
+
             const formData = new FormData();
             formData.append('photo', photo);
             const token = await getAccessToken();
             const photoResponse = await api.post('/posts/upload', formData, {
+
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const photoUrl = photoResponse.data.url;
+
+            const postData = {
+                title,
+                content,
+                img: photoUrl,
+                userName,
+                userImage: image,
+                _id: null,
+                numLikes: 0,
+                comments: 0,
+                postImg: null,
+                userImg: null,
+                ownerId: null,
+            };
+
+            dispatch(create_post(postData));
+        } catch (error) {
+            console.error('Error creating post:', error);
+=======
                 headers: { 
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
@@ -75,6 +175,7 @@ const CreatePost: React.FC = () => {
         } catch (error) {
             console.error('Error creating post:', error);
             // Display a toast notification for error
+
             toast.error('Failed to create the post');
         } finally {
             toast.success('Post created successfully!');
@@ -107,9 +208,21 @@ const CreatePost: React.FC = () => {
                         />
                     </div>
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="content">
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="block text-gray-700 text-sm font-bold" htmlFor="content">
                             Content
                         </label>
+                        <button
+                            onClick={generateContent}
+                            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
+                            disabled={aiLoading}
+                        >
+                            {/* Two stars */}
+                            <FaStar className="text-yellow-300" />
+                            <span>{aiLoading ? 'Generating...' : 'Generate a post based on your title'}</span>
+                            <FaStar className="text-yellow-300" />
+                        </button>
+                    </div>
                         <ReactQuill
                             value={content}
                             onChange={handleContentChange}
