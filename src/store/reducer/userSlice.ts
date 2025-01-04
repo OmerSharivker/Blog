@@ -58,7 +58,6 @@ export const getUserInfo =  createAsyncThunk(
 );
 
 
-
 export const update_profile =  createAsyncThunk(
     'user/update_profile',
     async (userData: { userName: string; image: unknown }, { rejectWithValue, fulfillWithValue }) => {
@@ -75,8 +74,6 @@ export const update_profile =  createAsyncThunk(
         }
     }
 );
-=======
-
 
 const userSlice = createSlice({
     name: 'user',
@@ -137,7 +134,6 @@ const userSlice = createSlice({
             state.image = '';
             state.userId = '';
         })
-
         .addCase(update_profile.fulfilled, (state, { payload }) => {
             state.image = payload.image;
             state.userName = payload.userName;
@@ -145,8 +141,6 @@ const userSlice = createSlice({
         .addCase(update_profile.rejected, (state) => {
             state.errorMessage = "Error updating profile";
         })
-=======
-
      
     
     }

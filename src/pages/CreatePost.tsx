@@ -10,21 +10,17 @@ import { toast } from 'react-toastify';
 import api, { local } from '../api/api';
 import { getAccessToken } from '../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
-
 import { FaStar } from 'react-icons/fa';
 import OpenAI from 'openai';
 
 
-const openai = new OpenAI({
+// const openai = new OpenAI({
 
-});
-=======
-
+// });
 
 const CreatePost: React.FC = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-
     const [photo, setPhoto] = useState<File | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -39,13 +35,6 @@ const CreatePost: React.FC = () => {
             navigate('/login');
         }
     }, [navigate]);
-=======
-    const [photo, setPhoto] = useState<File | null>(null); // File input for post image
-    const [photoPreview, setPhotoPreview] = useState<string | null>(null); // Photo preview
-    const [loading, setLoading] = useState(false);
-    const { userName, image } = useSelector((state: RootState) => state.user);
-    const dispatch = useDispatch<AppDispatch>();
-    const navigate = useNavigate();
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
@@ -59,40 +48,39 @@ const CreatePost: React.FC = () => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setPhoto(file);
-
             setPhotoPreview(URL.createObjectURL(file));
         }
     };
 
     const generateContent = async () => {
-        if (!title.trim()) {
-            toast.error('Please enter a title to generate content');
-            return;
-        }
+        // if (!title.trim()) {
+        //     toast.error('Please enter a title to generate content');
+        //     return;
+        // }
 
-        setAiLoading(true);
+        // setAiLoading(true);
 
-        try {
-            const response = await openai.completions.create({
-                model: 'gpt-3.5-turbo-instruct',
-                prompt: `Write a blog post based on the following title: "${title}"`,
-                max_tokens: 200, 
-                temperature: 0.7,
-            });
+        // try {
+        //     const response = await openai.completions.create({
+        //         model: 'gpt-3.5-turbo-instruct',
+        //         prompt: `Write a blog post based on the following title: "${title}"`,
+        //         max_tokens: 200, 
+        //         temperature: 0.7,
+        //     });
 
-            const generatedContent = response.choices[0]?.text?.trim();
-            if (generatedContent) {
-                setContent(generatedContent);
-                toast.success('Content generated successfully!');
-            } else {
-                toast.error('Failed to generate content. Try again.');
-            }
-        } catch (error) {
-            console.error('Error generating content:', error);
-            toast.error('Failed to generate content. Try again.');
-        } finally {
-            setAiLoading(false);
-        }
+        //     const generatedContent = response.choices[0]?.text?.trim();
+        //     if (generatedContent) {
+        //         setContent(generatedContent);
+        //         toast.success('Content generated successfully!');
+        //     } else {
+        //         toast.error('Failed to generate content. Try again.');
+        //     }
+        // } catch (error) {
+        //     console.error('Error generating content:', error);
+        //     toast.error('Failed to generate content. Try again.');
+        // } finally {
+        //     setAiLoading(false);
+        // }
     };
 
    
@@ -105,26 +93,10 @@ const CreatePost: React.FC = () => {
 
         setLoading(true);
         try {
-=======
-            setPhotoPreview(URL.createObjectURL(file)); // Generate a preview URL for the photo
-        }
-    };
-
-    const handleSubmit = async () => {
-        if (!title || !content || !photo) {
-            toast.error('Please fill in all fields and upload a photo');
-            return;
-        }
-
-        setLoading(true);
-        try {
-            // Upload the photo
-
             const formData = new FormData();
             formData.append('photo', photo);
             const token = await getAccessToken();
             const photoResponse = await api.post('/posts/upload', formData, {
-
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`,
@@ -149,33 +121,6 @@ const CreatePost: React.FC = () => {
             dispatch(create_post(postData));
         } catch (error) {
             console.error('Error creating post:', error);
-=======
-                headers: { 
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`
-                },
-            });
-            const photoUrl = photoResponse.data.url;
-            const postData = {
-                title,
-                content,
-                img: photoUrl,
-                userName,
-                userImage: image,
-                _id: null,
-                numLikes: 0,
-                comments: 0,
-                postImg: null,
-                userImg: null,
-                ownerId: null,
-            };
-
-            // Create the post
-            dispatch(create_post(postData));
-        } catch (error) {
-            console.error('Error creating post:', error);
-            // Display a toast notification for error
-
             toast.error('Failed to create the post');
         } finally {
             toast.success('Post created successfully!');
