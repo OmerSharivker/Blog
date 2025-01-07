@@ -5,6 +5,7 @@ import { getAccessToken } from '../../utils/authUtils';
 
 // Define the Post type based on your API response structure
 interface Post {
+    likes: any;
     _id: string | null;
     title: string;
     content: string;
@@ -25,6 +26,7 @@ interface PostState {
     totalPages: number;
     totalPosts: number;
     successMessage: string; 
+    loading: boolean;
 }
 
 
@@ -143,6 +145,7 @@ export const postSlice = createSlice({
         totalPosts: 0,
         errorMessage : '',
         successMessage: '',
+        loading: true,
     } as PostState,
     reducers : {
         messageClear : (state) => {
@@ -153,7 +156,14 @@ export const postSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+        .addCase(get_posts.rejected, (state) => {
+            state.loading = false;
+        })
+        .addCase(get_posts.pending, (state) => {
+            state.loading = true;
+        })
         .addCase(get_posts.fulfilled, (state, { payload }) => {
+            state.loading = false;
             state.posts = payload.getPosts;
             state.currentPage = payload.currentPage;
             state.totalPages = payload.totalPages;
@@ -164,6 +174,7 @@ export const postSlice = createSlice({
         
             if (post) {
                 post.numLikes = payload.post.numLikes;
+                post.likes = payload.post.likes;
             }
             state.successMessage = payload.message;
         })

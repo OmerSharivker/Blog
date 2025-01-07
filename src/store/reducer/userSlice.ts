@@ -39,6 +39,18 @@ export const login = createAsyncThunk(
     }
 );
 
+export const googleLogin = createAsyncThunk(
+    'user/googleLogin',
+    async (userData: { email: string}, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const { data } = await api.post('/auth/googlelogin', userData);
+            return fulfillWithValue(data);
+        } catch (error : any) {
+            return rejectWithValue(error.response.data.error || 'Login failed');
+        }
+    }
+);
+
 export const getUserInfo =  createAsyncThunk(
     'user/getUserInfo',
     async (_, { rejectWithValue, fulfillWithValue }) => {
@@ -141,8 +153,16 @@ const userSlice = createSlice({
         .addCase(update_profile.rejected, (state) => {
             state.errorMessage = "Error updating profile";
         })
-     
-    
+        .addCase(googleLogin.fulfilled, (state, { payload }) => {
+            state.successMessage = payload.message;
+            localStorage.setItem('accessToken', payload.accessToken);
+            localStorage.setItem('refreshTokens', payload.refreshToken);
+            localStorage.setItem('accessTokenExpiry', (Date.now() + 3600000).toString());
+            localStorage.setItem('refreshTokenExpiry', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
+        })
+        .addCase(googleLogin.rejected, (state, { payload }) => {
+            state.errorMessage = payload as string;
+        })
     }
 });
 

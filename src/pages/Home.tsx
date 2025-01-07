@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import { messageClear } from '../store/reducer/postSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
-import { refreshAccessToken } from '../utils/authUtils';
 
 
 const Home: React.FC = () => {

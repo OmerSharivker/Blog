@@ -1,4 +1,3 @@
-import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ReactQuill from 'react-quill';
@@ -79,21 +78,22 @@ const EditPost: React.FC = () => {
             }
 
             const postData = {
-                id: postId,
+                id: postId ?? null,
                 title,
                 content,
-                img: photoUrl,
+                img: photoUrl || '',
                 userName,
-                userImage: image,
+                userImage: image || '',
                 _id: null,
                 numLikes: 0,
                 comments: 0,
                 postImg: null,
                 userImg: null,
                 ownerId: null,
+                likes: [],
             };
 
-            dispatch(update_post({postData,postId}));
+            dispatch(update_post({postData, postId: postId ?? null}));
         } catch (error) {
             console.error('Error updating post:', error);
             toast.error('Failed to update the post');
@@ -107,10 +107,19 @@ const EditPost: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
             <Header />
-            <main className="flex-grow p-4 flex justify-center items-center">
-                <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-6">
-                    <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Edit Post</h2>
-                    <div className="mb-6 flex items-center gap-4">
+            <main className="flex-grow p-4 flex justify-center items-center relative">
+                <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-6 relative">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-3xl font-bold text-gray-800">Edit Post</h2>
+                        <button
+                            className="text-gray p-2 rounded-full hover:bg-gray-500 transition"
+                            onClick={() => navigate(-1)}
+                            style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                            X
+                        </button>
+                    </div>
+                    <div className="mb-6 flex items-center gap-4 relative">
                         <img src={`${local}${image}`} alt={userName} className="w-12 h-12 rounded-full" />
                         <p className="text-lg font-bold text-gray-700">{userName}</p>
                     </div>
