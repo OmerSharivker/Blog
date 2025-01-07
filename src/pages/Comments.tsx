@@ -48,7 +48,7 @@ const Comments: React.FC = () => {
 
     const handleDeleteComment = (commentId: string) => {
         if (window.confirm('Are you sure you want to delete this comment?')) {
-            dispatch(delete_comment(commentId));
+            dispatch(delete_comment({ commentId }));
         }
     };
 
@@ -68,13 +68,20 @@ const Comments: React.FC = () => {
             <main className="flex-grow p-4">
                 {errorMessage && <div className="text-red-500 mb-4">{errorMessage}</div>}
                 <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden relative">
-                    <div className="flex items-center p-4">
+                    <div className="flex items-center p-4 relative">
                         {posts && (
                             <>
                                 <img src={`${local}${posts.userImg}`} alt={posts.userName} className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0" />
                                 <h2 className="ml-4 text-xl font-bold">{posts.userName}</h2>
                             </>
                         )}
+                        <button
+                            className="absolute top-2 right-2 text-gray p-2 rounded-full hover:bg-gray-500 transition"
+                            onClick={() => navigate(-1)}
+                            style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                            X
+                        </button>
                     </div>
                     {posts && posts.postImg && (
                         <div className="w-full h-48 bg-gray-200">
@@ -103,7 +110,7 @@ const Comments: React.FC = () => {
                         {comments.map(comment => (
                             <div key={comment._id} className="bg-gray-100 p-4 rounded-lg shadow-md relative">
                                 <div className="flex items-center">
-                                    <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0"></div>
+                                    <img src={`${local}${comment.img}`} alt={comment.userName} className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0" />
                                     <h4 className="ml-3 text-md font-semibold">{comment.userName}</h4>
                                     {comment.ownerId === userId && (
                                         <div className="absolute top-2 right-2 flex space-x-2">

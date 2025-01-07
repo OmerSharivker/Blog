@@ -13,15 +13,14 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
-    const { userName } = useSelector((state: RootState) => state.user);
+    const { userName, image } = useSelector((state: RootState) => state.user);
     const { posts } = useSelector((state: RootState) => state.posts);
-    const userImage = useSelector((state: RootState) => state.user.image);
     const { successMessage, errorMessage } = useSelector((state: RootState) => state.posts);
     const [isEditing, setIsEditing] = useState(false);
     const navigate = useNavigate();
     const [newName, setNewName] = useState(userName);
-    const [newImage, setNewImage] = useState<File | string |null>(userImage);
-    const [previewImage, setPreviewImage] = useState<string>(local + userImage);
+    const [newImage, setNewImage] = useState<File | string |null>(image);
+    const [previewImage, setPreviewImage] = useState<string>(local + image);
 
     useEffect(() => {
         // Redirect to login if no token exists
@@ -31,6 +30,10 @@ const Profile: React.FC = () => {
         }
     }, [navigate]);
 
+
+    useEffect(() => {
+        setPreviewImage(local + image);
+    }, [image]);
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewName(e.target.value);
@@ -51,11 +54,11 @@ const Profile: React.FC = () => {
         }
         try {
             const formData = new FormData();
-            if(newImage === userImage){
+            if(newImage === image){
               
                 const userData = {
                     userName: newName,
-                    image: userImage,
+                    image: image,
                 }
                 dispatch(update_profile(userData));
                 toast.success('Profile updated successfully!');
@@ -91,7 +94,7 @@ const Profile: React.FC = () => {
 
     const handleCancelChanges = () => {
         setNewName(userName);
-        setPreviewImage(local + userImage);
+        setPreviewImage(local + image);
         setNewImage(null);
         setIsEditing(false);
     };
