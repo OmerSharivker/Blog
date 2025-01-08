@@ -21,7 +21,10 @@ const MyPost: React.FC = () => {
     };
     const handleDelete = (postId: string) => {
         if (window.confirm('Are you sure you want to delete this post?')) {
-            dispatch(delete_post(postId));
+            dispatch(delete_post({
+                postId,
+                postData: null
+            }));
         }
     };
 
@@ -39,13 +42,13 @@ const MyPost: React.FC = () => {
                         <div className="absolute top-2 right-2 flex space-x-2">
                             <button
                                 className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition"
-                                onClick={() => handleEdit(post._id)}
+                                onClick={() => post._id && handleEdit(post._id)}
                             >
                                 <FaEdit />
                             </button>
                             <button
                                 className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
-                                onClick={() => handleDelete(post._id)}
+                                onClick={() => post._id && handleDelete(post._id)}
                             >
                                 <FaTrashAlt />
                             </button>
@@ -87,7 +90,7 @@ const MyPost: React.FC = () => {
                         {/* Like Button */}
                         <button
                             className="flex items-center gap-2 text-blue-500 hover:text-blue-600 transition"
-                            onClick={() => handleLike(post._id)}
+                            onClick={() => post._id && handleLike(post._id)}
                         >
                             <FaHeart className="text-red-500" /> {/* Heart Icon */}
                             <span className="text-gray-800 font-medium">{post.numLikes}</span>

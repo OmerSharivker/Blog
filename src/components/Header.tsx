@@ -38,8 +38,21 @@ function Header() {
 
                 {/* Center: Blog Link */}
                 <div className="flex-1 text-center">
-                    <a href="/" className="text-white text-lg font-semibold">
-                        Blog
+                    <a href="/" className="text-white text-lg font-semibold flex items-center justify-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 ml-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 12l2-2m0 0l7-7 7 7m-9-2v12m-4-4h8m4 4h-8m-4 4h8"
+                            />
+                        </svg>
                     </a>
                 </div>
 

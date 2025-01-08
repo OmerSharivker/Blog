@@ -32,7 +32,14 @@ const Comments: React.FC = () => {
                 }
         if (postId && newComment.trim()) {
             if (editingCommentId) {
-                dispatch(update_comment({ commentId: editingCommentId, content: newComment }));
+                const existingComment = comments.find(comment => comment._id === editingCommentId);
+                if (!existingComment) return;
+
+                const commentData = {
+                    ...existingComment,
+                    content: newComment,
+                };
+                dispatch(update_comment({ commentData, commentId: editingCommentId }));
                 setEditingCommentId(null);
             } else {
                 dispatch(add_comment({ postId, content: newComment }));

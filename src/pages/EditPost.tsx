@@ -78,19 +78,17 @@ const EditPost: React.FC = () => {
             }
 
             const postData = {
-                id: postId ?? null,
                 title,
                 content,
-                img: photoUrl || '',
                 userName,
-                userImage: image || '',
-                _id: null,
+                _id: postId ?? null,
                 numLikes: 0,
                 comments: 0,
-                postImg: null,
-                userImg: null,
+                postImg: photoUrl || '',
+                userImg: image || '',
                 ownerId: null,
                 likes: [],
+                createdAt: new Date().toISOString(), 
             };
 
             dispatch(update_post({postData, postId: postId ?? null}));

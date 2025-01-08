@@ -5,15 +5,18 @@ import { toast } from 'react-toastify';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import MyPost from '../components/MyPost';
-import { messageClear } from '../store/reducer/postSlice';
+import { messageClear, update_post } from '../store/reducer/postSlice';
 import api, { local } from '../api/api';
 import { getAccessToken } from '../utils/authUtils';
 import { update_profile } from '../store/reducer/userSlice';
 import { Link, useNavigate } from 'react-router-dom';
+import { update_comment } from '../store/reducer/commentSlice';
 
 const Profile: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
-    const { userName, image } = useSelector((state: RootState) => state.user);
+    const {user} = useSelector((state: RootState) => state);
+    const {comments} = useSelector((state: RootState) => state.comments);
+    const { userName, image, userId } = useSelector((state: RootState) => state.user);
     const { posts } = useSelector((state: RootState) => state.posts);
     const { successMessage, errorMessage } = useSelector((state: RootState) => state.posts);
     const [isEditing, setIsEditing] = useState(false);
@@ -52,38 +55,75 @@ const Profile: React.FC = () => {
             toast.error('Name cannot be empty!');
             return;
         }
+        let photoUrl: string | null = null;
         try {
             const formData = new FormData();
-            if(newImage === image){
-              
+            if (newImage === image && userName === newName) {
+                toast.info('No changes made to the profile.');
+                return;
+            }
+
+            if (newImage === image) {
                 const userData = {
                     userName: newName,
                     image: image,
-                }
-                dispatch(update_profile(userData));
+                };
+                await dispatch(update_profile(userData));
                 toast.success('Profile updated successfully!');
-               
+            } else {
+                if (newImage) {
+                    console.log('newImage:', newImage);
+                    formData.append('photo', newImage);
+                }
+                const token = await getAccessToken();
+                const photoResponse = await api.post('/posts/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                photoUrl = photoResponse.data.url.toString();
+                const userData = {
+                    userName: newName,
+                    image: photoUrl,
+                };
+                await dispatch(update_profile(userData));
+                toast.success('Profile updated successfully!');
             }
-            else{
-            if (newImage) {
-                console.log('newImage:', newImage);
-                formData.append('photo', newImage);
-            }
-            const token = await getAccessToken();
-            const photoResponse = await api.post('/posts/upload', formData, {
-                headers: { 
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`
-                },
+            posts.forEach(async (post) => {
+                const postData = {
+                    title: post.title,
+                    content: post.content,
+                    userName: newName ? newName : user.userName,
+                    _id: post._id,
+                    numLikes: post.numLikes,
+                    comments: post.comments,
+                    postImg: post.postImg,
+                    userImg: photoUrl ? photoUrl : user.image,
+                    ownerId: post.ownerId,
+                    likes: post.likes,
+                    createdAt: post.createdAt, 
+                };
+                console.log(image);
+                console.log(user.image);
+
+                await dispatch(update_post({postData, postId : post._id}));
+                
             });
-            const photoUrl = photoResponse.data.url;
-            const userData = {
-                userName: newName,
-                image: photoUrl,
-            }
-            dispatch(update_profile(userData));
-            toast.success('Profile updated successfully!');
-        }
+
+            comments.forEach(async (comment) => {
+                const commentData = {
+                    _id: comment._id,
+                    content: comment.content,
+                    postId: comment.postId,
+                    ownerId: comment.ownerId,
+                    img: photoUrl ? photoUrl : user.image,
+                    userName: newName ? newName : user.userName,
+                };
+                if(comment.ownerId === userId){
+                    await dispatch(update_comment({commentData, commentId: comment._id}));
+                }
+            });
         } catch (error) {
             console.error('Error uploading profile image:', error);
             toast.error('Failed to upload profile image');

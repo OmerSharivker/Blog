@@ -14,6 +14,7 @@ const Post: React.FC = () => {
     const { userId } = useSelector((state: RootState) => state.user);
     const [currentPagee, setCurrentPage] = useState(currentPage);
     const [postsPerPage] = useState(2);
+    const [sortCriteria, setSortCriteria] = useState('createdAt');
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
@@ -29,28 +30,45 @@ const Post: React.FC = () => {
                 postId,
                 postData: null
             }));
+            setTimeout(() => {
+                dispatch(get_posts({ page: currentPagee, limit: postsPerPage, sort: sortCriteria }));
+            }, 500);
         }
     };
 
     useEffect(() => {
-        dispatch(get_posts({ page: currentPagee, limit: postsPerPage }));
-    }, [dispatch, currentPagee, postsPerPage]);
-
-    const currentPosts = posts
-   
-
+        dispatch(get_posts({ page: currentPagee, limit: postsPerPage , sort: sortCriteria}));
+    }, [dispatch, currentPagee, postsPerPage, sortCriteria]);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
         window.scrollTo(0, 0);
     };
+
+    const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSortCriteria(event.target.value);
+        handlePageChange(1);
+    };
+
+    const sortedPosts = posts;
+
     return (
         <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto">
+            <div className="flex justify-end mb-4">
+                <select
+                    value={sortCriteria}
+                    onChange={handleSortChange}
+                    className="bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition hover:bg-gray-100"
+                >
+                    <option value="createdAt">Newest</option>
+                    <option value="numLikes">Most Liked</option>
+                </select>
+            </div>
             {loading ? (
             <Loader />
             ) : (
             <>
-                {currentPosts.map(post => (
+                {sortedPosts.map(post => (
                 <div key={post._id} className="bg-white shadow-md rounded-lg overflow-hidden relative">
                     {post.ownerId === userId && (
                     <div className="absolute top-2 right-2 flex space-x-2">
