@@ -9,13 +9,13 @@ interface Post {
     _id: string | null;
     title: string;
     content: string;
-    img: string;
     userName: string;
-    numLikes: number | null;
+    numLikes: number | 0;
     comments: number | null;
     userImg: string | null;
     postImg: string | null;
     ownerId: string | null;
+    createdAt: string | null;
 }
 
 // Define the state type for the slice
@@ -32,9 +32,9 @@ interface PostState {
 
 export const get_posts = createAsyncThunk(
     'posts/get_posts',
-    async ({ page, limit }: { page: number; limit: number }, { rejectWithValue, fulfillWithValue }) => {
+    async ({ page, limit , sort}: { page: number; limit: number, sort: string }, { rejectWithValue, fulfillWithValue }) => {
         try {
-            const {data} = await api.get(`/posts?page=${page}&limit=${limit}`);
+            const {data} = await api.get(`/posts?page=${page}&limit=${limit}&sort=${sort}`);
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error)
@@ -103,8 +103,8 @@ export const update_post = createAsyncThunk(
 
 
 export const delete_post = createAsyncThunk(
-    'posts/update_post',
-    async ( postId : UpdatePostParams, { rejectWithValue, fulfillWithValue }) => {
+    'posts/delete_post',
+    async ( {postId} : UpdatePostParams, { rejectWithValue, fulfillWithValue }) => {
         try {
             const token = await getAccessToken();
             const { data } = await api.delete(`/posts/${postId}`, {
@@ -180,6 +180,24 @@ export const postSlice = createSlice({
         })
         .addCase(create_post.rejected, (state) => {
             state.errorMessage = "Error creating post";
+        })
+        .addCase(update_post.fulfilled, (state, { payload}) => {
+            const post = state.posts.find(post => post._id === payload.updatePost._id);
+            console.log(post);
+        
+            if (post) {
+                post.title = payload.updatePost.title;
+                post.content = payload.updatePost.content;
+                post.postImg = payload.updatePost.postImg;
+                post.createdAt = payload.updatePost.createdAt;
+                post.userName = payload.updatePost.userName;
+                post.userImg = payload.updatePost.userImg;
+                post.numLikes = payload.updatePost.numLikes;
+                post.comments = payload.updatePost.comments;
+                post.likes = payload.updatePost.likes;
+                post.ownerId = payload.updatePost.ownerId;
+                post._id = payload.updatePost._id;
+            }
         })
         // .addCase(update_post.rejected, (state) => {
         //     state.errorMessage = "Error creating post";

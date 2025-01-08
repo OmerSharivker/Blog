@@ -104,6 +104,8 @@ const CreatePost: React.FC = () => {
                 postImg: null,
                 userImg: null,
                 ownerId: null,
+                likes: [],
+                createdAt: new Date().toISOString(),
             };
 
             dispatch(create_post(postData));

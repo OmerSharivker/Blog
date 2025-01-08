@@ -5,15 +5,17 @@ import { getAccessToken } from '../../utils/authUtils';
 
 
 interface Post {
-    _id: string;
+    likes: any;
+    _id: string | null;
     title: string;
     content: string;
-    img: string;
     userName: string;
-    numLikes: number;
-    comments: number;
-    userImg: string;
-    postImg: string;
+    numLikes: number | 0;
+    comments: number | null;
+    userImg: string | null;
+    postImg: string | null;
+    ownerId: string | null;
+    createdAt: string | null;
 }
 interface Comments {
     _id: string;
@@ -81,12 +83,16 @@ export const add_comment = createAsyncThunk(
         }
     }
 );
+interface UpdateCommentParams {
+    commentData: Comments | null;
+    commentId: string | null;
+}
 export const update_comment = createAsyncThunk(
     'comment/update_comment',
-    async ({ commentId, content }: { commentId: string; content: string }, { rejectWithValue, fulfillWithValue }) => {
+    async ({ commentData, commentId }: UpdateCommentParams, { rejectWithValue, fulfillWithValue }) => {
         try {
             const token = await getAccessToken();
-            const response = await api.put(`/comment/${commentId}`, {content }, {
+            const response = await api.put(`/comment/${commentId}`, {commentData }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -119,15 +125,17 @@ export const commentSlice = createSlice({
     name: 'comment',    
     initialState: {
         posts: {
+            likes: [],
             _id: '',
             title: '',
             content: '',
-            img: '',
             userName: '',
             numLikes: 0,
             comments: 0,
             userImg: '',
-            postImg: ''
+            postImg: '',
+            ownerId: '',
+            createdAt: ''
         },
         comments: [],
         errorMessage : '',
@@ -154,8 +162,16 @@ export const commentSlice = createSlice({
          
         })
         .addCase(update_comment.fulfilled, (state, { payload }) => {
-           
-            state.successMessage = "comment updated successfully"
+            const comment = state.comments.find(comment => comment._id === payload.updatedComment._id);
+
+            if (comment) {
+                comment.content = payload.updatedComment.content;
+                comment.postId = payload.updatedComment.postId;
+                comment.img = payload.updatedComment.img;
+                comment.userName = payload.updatedComment.userName;
+                comment.ownerId = payload.updatedComment.ownerId;
+            }
+
         })
         .addCase(delete_comment.fulfilled, (state) => {
                     state.successMessage = "Post deleted successfully";

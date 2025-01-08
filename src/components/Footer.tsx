@@ -1,8 +1,7 @@
-import React from 'react';
 
 function Footer() {
     return (
-        <footer className="py-3 px-2 mt-auto bg-gray-200 dark:bg-gray-800 w-full">
+        <footer className="py-3 px-2 mt-auto bg-gray-800 w-full">
             <div className="max-w-sm mx-auto text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                     {'Made with ❤️ by omer and shlomi'}

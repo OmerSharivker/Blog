@@ -149,6 +149,7 @@ const userSlice = createSlice({
         .addCase(update_profile.fulfilled, (state, { payload }) => {
             state.image = payload.image;
             state.userName = payload.userName;
+            
         })
         .addCase(update_profile.rejected, (state) => {
             state.errorMessage = "Error updating profile";
