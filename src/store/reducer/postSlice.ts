@@ -178,12 +178,15 @@ export const postSlice = createSlice({
             }
             state.successMessage = payload.message;
         })
+        .addCase(create_post.fulfilled, (state) => {
+            state.loading = true;
+        })
         .addCase(create_post.rejected, (state) => {
+            
             state.errorMessage = "Error creating post";
         })
         .addCase(update_post.fulfilled, (state, { payload}) => {
             const post = state.posts.find(post => post._id === payload.updatePost._id);
-            console.log(post);
         
             if (post) {
                 post.title = payload.updatePost.title;
@@ -202,7 +205,8 @@ export const postSlice = createSlice({
         // .addCase(update_post.rejected, (state) => {
         //     state.errorMessage = "Error creating post";
         // })
-        .addCase(delete_post.fulfilled, (state) => {
+        .addCase(delete_post.fulfilled, (state,{payload}) => {
+            state.posts = state.posts.filter(post => post._id !== payload.post._id);
             state.successMessage = "Post deleted successfully";
         })
         .addCase(delete_post.rejected, (state) => {

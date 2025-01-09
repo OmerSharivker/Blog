@@ -1,4 +1,4 @@
-// filepath: /Users/omersharivker/dev/front_blog/src/index.tsx
+
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import store from './store/store';
