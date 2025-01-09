@@ -106,8 +106,9 @@ export const update_comment = createAsyncThunk(
 
 export const delete_comment = createAsyncThunk(
     'comment/delete_comment',
-    async ( commentId : { commentId: string }, { rejectWithValue, fulfillWithValue }) => {
+    async ( commentId :string, { rejectWithValue, fulfillWithValue }) => {
         try {
+            console.log(commentId)
             const token = await getAccessToken();
             const response = await api.delete(`/comment/${commentId}`, {
                 headers: {
@@ -174,7 +175,7 @@ export const commentSlice = createSlice({
 
         })
         .addCase(delete_comment.fulfilled, (state) => {
-                    state.successMessage = "Post deleted successfully";
+                    state.successMessage = "Comment deleted successfully";
                 })
        .addCase(delete_comment.rejected, (state) => {
                     state.errorMessage = "Error deleting post";

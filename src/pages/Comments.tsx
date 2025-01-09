@@ -55,7 +55,7 @@ const Comments: React.FC = () => {
 
     const handleDeleteComment = (commentId: string) => {
         if (window.confirm('Are you sure you want to delete this comment?')) {
-            dispatch(delete_comment({ commentId }));
+            dispatch(delete_comment( commentId ));
         }
     };
 

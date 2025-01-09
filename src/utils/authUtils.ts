@@ -54,7 +54,7 @@ const getAccessToken = async (): Promise<string | null> => {
 
 const logout = async (navigate: ReturnType<typeof useNavigate>): Promise<void> => {
     const refreshToken = localStorage.getItem('refreshTokens');
-    console.log(refreshToken);
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('accessTokenExpiry');
     localStorage.removeItem('refreshTokenExpiry');

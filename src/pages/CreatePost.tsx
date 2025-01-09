@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ReactQuill from 'react-quill';
@@ -10,6 +10,8 @@ import api, { local } from '../api/api';
 import { getAccessToken } from '../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../utils/cropImage';  
 
 
 const CreatePost: React.FC = () => {
@@ -17,6 +19,9 @@ const CreatePost: React.FC = () => {
     const [content, setContent] = useState('');
     const [photo, setPhoto] = useState<File | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [croppedArea, setCroppedArea] = useState(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
     const [loading, setLoading] = useState(false);
     const [aiLoading, setAiLoading] = useState(false); // AI loading state
     const { userName, image } = useSelector((state: RootState) => state.user);
@@ -71,7 +76,23 @@ const CreatePost: React.FC = () => {
         }
     };
 
-   
+    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+        setCroppedArea(croppedAreaPixels);
+    }, []);
+
+    const handleSaveCroppedImage = async () => {
+        if (!photo || !croppedArea) return;
+
+        try {
+            const croppedImage = await getCroppedImg(photoPreview, croppedArea);
+            setPhoto(croppedImage);
+            setPhotoPreview(URL.createObjectURL(croppedImage));
+        } catch (error) {
+            console.error('Error cropping image:', error);
+            toast.error('Failed to crop image. Try again.');
+        }
+    };
+
 
     const handleSubmit = async () => {
         if (!title || !content || !photo) {
@@ -118,6 +139,7 @@ const CreatePost: React.FC = () => {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
@@ -176,13 +198,23 @@ const CreatePost: React.FC = () => {
                             onChange={handlePhotoChange}
                             className="w-full"
                         />
-                        {photoPreview && (
-                            <div className="mt-4">
-                                <img
-                                    src={photoPreview}
-                                    alt="Selected"
-                                    className="w-full h-25 rounded-lg border border-gray-300 shadow-lg"
+                          {photoPreview && (
+                            <div className="mt-4 relative w-full h-64 bg-gray-200">
+                                <Cropper
+                                    image={photoPreview}
+                                    crop={crop}
+                                    zoom={zoom}
+                                    aspect={7 / 2}
+                                    onCropChange={setCrop}
+                                    onZoomChange={setZoom}
+                                    onCropComplete={onCropComplete}
                                 />
+                                <button
+                                    onClick={handleSaveCroppedImage}
+                                    className="absolute bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                                >
+                                    Save Cropped Image
+                                </button>
                             </div>
                         )}
                     </div>

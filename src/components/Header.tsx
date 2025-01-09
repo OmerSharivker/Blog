@@ -5,6 +5,7 @@ import { AppDispatch, RootState } from '../store/store';
 import { getUserInfo, logoutUser } from '../store/reducer/userSlice';
 import { local } from '../api/api';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaHome } from 'react-icons/fa';
 
 function Header() {
     const navigate = useNavigate();
@@ -29,31 +30,20 @@ function Header() {
             <div className="container mx-auto flex items-center">
                 {/* Left: Logo */}
                 <div className="flex items-center w-1/4">
-                    <img
-                        src={`${local}/blog.png`}
-                        alt="Logo"
-                        className="w-10 h-10"
-                    />
+                    <Link to="/">
+                        <img
+                            src={`${local}/blog.png`}
+                            alt="Logo"
+                            className="w-10 h-10"
+                        />
+                    </Link>
                 </div>
 
-                {/* Center: Blog Link */}
-                <div className="flex-1 text-center">
-                    <a href="/" className="text-white text-lg font-semibold flex items-center justify-center">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 ml-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M3 12l2-2m0 0l7-7 7 7m-9-2v12m-4-4h8m4 4h-8m-4 4h8"
-                            />
-                        </svg>
-                    </a>
+                {/* Center: Navigation */}
+                <div className="flex items-center justify-center w-1/2">
+                    <Link to="/" className="text-white text-xl flex items-center gap-2">
+                        <FaHome className="text-2xl" /> 
+                    </Link>
                 </div>
 
                 {/* Right: User Info */}

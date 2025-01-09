@@ -13,6 +13,24 @@ const Pagination: React.FC<PaginationProps> = ({
     onPageChange,
     className = ''
 }) => {
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        if (totalPages <= 3) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage <= 2) {
+                pageNumbers.push(1, 2, 3, '...');
+            } else if (currentPage >= totalPages - 1) {
+                pageNumbers.push('...', totalPages - 2, totalPages - 1, totalPages);
+            } else {
+                pageNumbers.push('...', currentPage - 1, currentPage, currentPage + 1, '...');
+            }
+        }
+        return pageNumbers;
+    };
+
     return (
         <div className={`flex justify-center gap-2 my-4 ${className}`}>
             <button 
@@ -23,17 +41,18 @@ const Pagination: React.FC<PaginationProps> = ({
                 Previous
             </button>
             
-            {[...Array(totalPages)].map((_, index) => (
+            {getPageNumbers().map((page, index) => (
                 <button
-                    key={index + 1}
-                    onClick={() => onPageChange(index + 1)}
+                    key={index}
+                    onClick={() => typeof page === 'number' && onPageChange(page)}
                     className={`px-4 py-2 rounded transition-colors ${
-                        currentPage === index + 1 
+                        currentPage === page 
                         ? 'bg-blue-500 text-white' 
                         : 'bg-gray-200 hover:bg-gray-300'
                     }`}
+                    disabled={typeof page !== 'number'}
                 >
-                    {index + 1}
+                    {page}
                 </button>
             ))}
             

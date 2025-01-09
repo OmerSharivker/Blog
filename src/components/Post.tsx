@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { local } from '../api/api';
 import parse from 'html-react-parser';
-import { FaEdit, FaHeart, FaRegCommentDots, FaTrashAlt } from 'react-icons/fa'; // Importing Font Awesome icons
+import { FaEdit, FaHeart, FaRegCommentDots, FaTrashAlt } from 'react-icons/fa'; 
 import Pagination from './Pagination';
 import Loader from './Loader';
 
@@ -29,16 +29,24 @@ const Post: React.FC = () => {
             dispatch(delete_post({
                 postId,
                 postData: null
-            }));
-            setTimeout(() => {
-                dispatch(get_posts({ page: currentPagee, limit: postsPerPage, sort: sortCriteria }));
-            }, 500);
+            })).then(() => {
+                if (posts.length===1 && currentPagee>1) {
+                    setCurrentPage(currentPagee-1);
+                }
+                dispatch(get_posts({ page: currentPagee, limit: postsPerPage , sort: sortCriteria}));
+        
+            });
         }
-    };
-
+    }
     useEffect(() => {
-        dispatch(get_posts({ page: currentPagee, limit: postsPerPage , sort: sortCriteria}));
-    }, [dispatch, currentPagee, postsPerPage, sortCriteria]);
+      
+    }, [loading]);
+  
+    useEffect(() => {
+        setTimeout(() => {
+            dispatch(get_posts({ page: currentPagee, limit: postsPerPage , sort: sortCriteria}));
+        }, 300);
+    }, [dispatch,currentPagee, postsPerPage, sortCriteria]);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -89,14 +97,14 @@ const Post: React.FC = () => {
 
                     {/* Post Image */}
                     {post.postImg && (
-                    <div className="w-full h-48 bg-gray-200">
-                        <img
-                        src={`${local}${post.postImg}`}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                        />
-                    </div>
-                    )}
+                                <Link to={`/comments/${post._id}`} className="block w-full h-48 bg-gray-200">
+                                    <img
+                                        src={`${local}${post.postImg}`}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </Link>
+                     )}
 
                     {/* User Info */}
                     <div className="flex items-center p-4">
