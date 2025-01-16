@@ -1,0 +1,12 @@
+# Ignore node_modules directory
+node_modules
+
+# Ignore log files
+*.log
+
+# Ignore local build artifacts but not the dist directory itself
+dist/*
+!dist/.gitkeep
+
+# Ignore .env files
+.env

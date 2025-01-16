@@ -30,14 +30,25 @@ const MyPost: React.FC = () => {
 
     useEffect(() => {
         dispatch(get_posts_byId());
-    }, [dispatch,posts]);
+    }, [dispatch]);
 
-
-
+    if (posts.length === 0) {
+        return (
+            <div className="flex flex-col justify-center items-center h-full">
+                <p className="text-gray-500 mb-4">You have no posts yet.</p>
+                <Link to="/create-post">
+                    <button
+                        className="bg-gradient-to-r mt-3 from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
+                    >
+                        Create a Post
+                    </button>
+                </Link>
+            </div>
+        );}
     return (
         <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto">
             {posts.map(post => (
-                <div key={post._id} className="bg-white shadow-md rounded-lg overflow-hidden relative">
+                    <div key={post._id} className="bg-white shadow-md rounded-lg overflow-hidden relative">
                        {post.ownerId === userId && (
                         <div className="absolute top-2 right-2 flex space-x-2">
                             <button

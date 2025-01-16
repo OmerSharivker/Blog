@@ -9,7 +9,7 @@ import { messageClear, update_post } from '../store/reducer/postSlice';
 import api, { local } from '../api/api';
 import { getAccessToken } from '../utils/authUtils';
 import { update_profile } from '../store/reducer/userSlice';
-import { Link, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import { update_comment } from '../store/reducer/commentSlice';
 
 const Profile: React.FC = () => {
@@ -72,7 +72,7 @@ const Profile: React.FC = () => {
                 toast.success('Profile updated successfully!');
             } else {
                 if (newImage) {
-                    console.log('newImage:', newImage);
+                   
                     formData.append('photo', newImage);
                 }
                 const token = await getAccessToken();
@@ -104,8 +104,7 @@ const Profile: React.FC = () => {
                     likes: post.likes,
                     createdAt: post.createdAt, 
                 };
-                console.log(image);
-                console.log(user.image);
+               
 
                 await dispatch(update_post({postData, postId : post._id}));
                 
@@ -233,19 +232,8 @@ const Profile: React.FC = () => {
                     {/* User Posts Section */}
                     <div className="md:w-3/4 bg-white shadow-lg rounded-lg p-6">
                         <h2 className="text-xl font-bold mb-4">Your Posts</h2>
-                    {posts.length === 0 || userName == 'Guest' ? (
-                        <div className="flex justify-center items-center h-full">
-                            <Link to="/create-post">
-                                <button
-                                    className="bg-gradient-to-r mt-3 from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
-                                >
-                                    Create a Post
-                                </button>
-                            </Link>
-                        </div>
-                    ) : (
                         <MyPost />
-                    )}
+                    
                        
                     </div>
                 </div>

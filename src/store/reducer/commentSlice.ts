@@ -5,7 +5,7 @@ import { getAccessToken } from '../../utils/authUtils';
 
 
 interface Post {
-    likes: any;
+    likes: string[];
     _id: string | null;
     title: string;
     content: string;
@@ -108,7 +108,7 @@ export const delete_comment = createAsyncThunk(
     'comment/delete_comment',
     async ( commentId :string, { rejectWithValue, fulfillWithValue }) => {
         try {
-            console.log(commentId)
+        
             const token = await getAccessToken();
             const response = await api.delete(`/comment/${commentId}`, {
                 headers: {
@@ -174,9 +174,10 @@ export const commentSlice = createSlice({
             }
 
         })
-        .addCase(delete_comment.fulfilled, (state) => {
-                    state.successMessage = "Comment deleted successfully";
-                })
+        .addCase(delete_comment.fulfilled, (state, { payload }) => {
+            state.comments = state.comments.filter(comment => comment._id !== payload.commentId);
+            state.successMessage = "Comment deleted successfully";
+        })
        .addCase(delete_comment.rejected, (state) => {
                     state.errorMessage = "Error deleting post";
                 })
