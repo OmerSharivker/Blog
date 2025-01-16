@@ -22,7 +22,7 @@ const Comments: React.FC = () => {
             dispatch(get_post(postId));
             dispatch(get_comments(postId));
         }
-    }, [dispatch, postId,comments]);
+    }, [dispatch]);
 
     const handleAddOrUpdateComment = () => {
             
@@ -55,7 +55,11 @@ const Comments: React.FC = () => {
 
     const handleDeleteComment = (commentId: string) => {
         if (window.confirm('Are you sure you want to delete this comment?')) {
-            dispatch(delete_comment( commentId ));
+            dispatch(delete_comment( commentId )).then(()=>{
+            if(postId){
+                dispatch(get_comments(postId));
+             }
+            });
         }
     };
 

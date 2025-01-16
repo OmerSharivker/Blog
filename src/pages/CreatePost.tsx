@@ -15,11 +15,17 @@ import getCroppedImg from '../utils/cropImage';
 
 
 const CreatePost: React.FC = () => {
+    interface CroppedArea {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+      }
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [photo, setPhoto] = useState<File | null>(null);
-    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-    const [croppedArea, setCroppedArea] = useState(null);
+    const [photoPreview, setPhotoPreview] = useState<string>("");
+    const [croppedArea, setCroppedArea] = useState<CroppedArea>({ x: 0, y: 0, width: 0, height: 0 });
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -76,7 +82,8 @@ const CreatePost: React.FC = () => {
         }
     };
 
-    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+    const onCropComplete = useCallback((croppedArea :CroppedArea,croppedAreaPixels: CroppedArea) => {
+        setCroppedArea(croppedArea);
         setCroppedArea(croppedAreaPixels);
     }, []);
 
@@ -87,6 +94,7 @@ const CreatePost: React.FC = () => {
             const croppedImage = await getCroppedImg(photoPreview, croppedArea);
             setPhoto(croppedImage);
             setPhotoPreview(URL.createObjectURL(croppedImage));
+            setZoom(1);
         } catch (error) {
             console.error('Error cropping image:', error);
             toast.error('Failed to crop image. Try again.');

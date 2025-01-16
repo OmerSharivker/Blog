@@ -5,7 +5,7 @@ import { getAccessToken } from '../../utils/authUtils';
 
 // Define the Post type based on your API response structure
 interface Post {
-    likes: any;
+    likes: string[];
     _id: string | null;
     title: string;
     content: string;
@@ -112,6 +112,7 @@ export const delete_post = createAsyncThunk(
                     Authorization: `Bearer ${token}`
                 }
             });
+      
             return fulfillWithValue(data);
         } catch (error) {
             return rejectWithValue(error);
