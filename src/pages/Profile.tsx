@@ -24,7 +24,7 @@ const Profile: React.FC = () => {
     const [newName, setNewName] = useState(userName);
     const [newImage, setNewImage] = useState<File | string |null>(image);
     const [previewImage, setPreviewImage] = useState<string>(local + image);
-
+    const [load,setLoad]=useState(false)
     useEffect(() => {
         // Redirect to login if no token exists
         if (!localStorage.getItem('accessToken')) {
@@ -56,10 +56,12 @@ const Profile: React.FC = () => {
             return;
         }
         let photoUrl: string | null = null;
+        setLoad(false);
         try {
             const formData = new FormData();
             if (newImage === image && userName === newName) {
                 toast.info('No changes made to the profile.');
+                setLoad(false);
                 return;
             }
 
@@ -127,7 +129,7 @@ const Profile: React.FC = () => {
             console.error('Error uploading profile image:', error);
             toast.error('Failed to upload profile image');
         }
-  
+        setLoad(false);
         setIsEditing(false);
     };
 
@@ -202,9 +204,10 @@ const Profile: React.FC = () => {
                                     <div className="flex justify-between mt-4">
                                         <button
                                             onClick={handleSaveChanges}
+                                            disabled={load}
                                              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out hover:shadow-xl"
                                         >
-                                            Save
+                                              { load ?  'Saving...' : 'Save'}
                                         </button>
                                         <button
                                             onClick={handleCancelChanges}

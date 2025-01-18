@@ -12,8 +12,8 @@ RUN npm ci
 
 COPY . .
 
-ARG VITE_API_URL
-RUN VITE_API_URL=${VITE_API_URL} npm run build
+
+RUN VITE_API_URL=https://node103.cs.colman.ac.il/api npm run build
 
 #production stage
 FROM caddy:2-alpine as production

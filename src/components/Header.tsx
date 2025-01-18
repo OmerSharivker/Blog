@@ -12,7 +12,7 @@ function Header() {
     const dispatch = useDispatch<AppDispatch>();
     const {userName} = useSelector((state: RootState) => state.user);
     let image = useSelector((state: RootState) => state.user.image);
-    image = image ? `${local}${image}` : `${local}/image.png`;
+    image = image ? `${local}${image}` : `${local}/public/image.png`;
     const isLogIn = !!localStorage.getItem('accessToken');
 
     useEffect(() => {
@@ -32,7 +32,7 @@ function Header() {
                 <div className="flex items-center w-1/4">
                     <Link to="/">
                         <img
-                            src={`${local}/blog.png`}
+                            src={`${local}/public/blog.png`}
                             alt="Logo"
                             className="w-10 h-10"
                         />
